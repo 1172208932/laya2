@@ -1,0 +1,22 @@
+{
+    "code": 200,
+    "time": 1543975839,
+    "message": "",
+    "value": {
+        "round_limit": 0,
+        "list": [
+            {
+                "match_type_id": 1,
+                "count": 619
+            },
+            {
+                "match_type_id": 2,
+                "count": 233
+            },
+            {
+                "match_type_id": 3,
+                "count": 447
+            }
+        ]
+    }
+}

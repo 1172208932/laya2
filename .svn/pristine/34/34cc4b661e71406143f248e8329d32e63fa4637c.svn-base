@@ -1,0 +1,95 @@
+import LoadingView from "./Loading/LoadingView";
+
+export default class GameMain extends PaoYa.Main {
+	setupLoadingView(cb) {
+		Laya.loader.load(['scenes/common/Loading/LoadingView.scene', 'res/atlas/local/loading.atlas'], Laya.Handler.create(this, () => {
+			LoadingView.JSONView = Laya.loader.getRes('scenes/common/Loading/LoadingView.scene')
+			let view = new LoadingView()
+			PaoYa.Navigator.adjustViewPosition(view)
+			Laya.Scene.setLoadingPage(view)
+			Laya.AtlasInfoManager.enable('fileconfig.json', Laya.Handler.create(this, cb))
+		}))
+	}
+	initRootScene(launchInfo, isFirstLaunch) {
+		this.setupLoadingView(() => {
+			this._initRootScene(launchInfo, isFirstLaunch)
+		})
+	}
+	_initRootScene(launchInfo, isFirstLaunch) {
+		let hideRes = this.hideRes;
+		if (hideRes && hideRes.mode != undefined && hideRes.targetAction != undefined && !(hideRes.mode == "hide" && hideRes.targetAction == 8)) {
+			Laya.Dialog.manager.closeAll();
+			this.navigator.popToRootScene();
+		}
+		if (launchInfo && launchInfo.referrerInfo && launchInfo.referrerInfo.extraData && launchInfo.referrerInfo.extraData.to) {
+			this.jumpRootScene(launchInfo);
+		} else {
+			if (isFirstLaunch) {
+				this.navigator.push("HomeView", {}, PaoYa.DataCenter.GAMERES, Laya.Handler.create(this, () => {
+					this.goToScene(launchInfo);
+				}),null,PaoYa.DataCenter.GAMEPREPARE);
+			} else {
+				this.goToScene(launchInfo);
+			}
+		}
+	}
+	goToScene(launchInfo) {
+		if (!launchInfo || !launchInfo.query || !launchInfo.query.type) {
+			return;
+		}
+		let query = launchInfo.query;
+		let scene = this.navigator.visibleScene;
+		switch (parseInt(query.type)) {
+			case PaoYa.ShareType.InviteFriend:
+				if (scene.sceneName != "IFHostView" || scene.sceneName != "IFMemberView") {
+					this.navigator.push("IFMemberView", { id: query.id, rname: query.rname })
+				} else {
+					let alert = new AlertDialog({
+						title: "提示",
+						message: "您已经在游戏房间,不能加入其他房间!"
+					})
+					alert.popup();
+				}
+				break;
+			case PaoYa.ShareType.GroupRank:
+				if (launchInfo.shareTicket) {
+					if (scene.sceneName != "RankGroupView") {
+						this.navigator.push("RankGroupView", { shareTicket: launchInfo.shareTicket })
+					}
+				}
+				break;
+		}
+	}
+
+	jumpRootScene(launchInfo) {
+		PaoYa.DataCenter.isFromMiniProgram = true;
+		let extraData = launchInfo.referrerInfo.extraData;
+		let sceneId = extraData.to;
+		let params = extraData.p;
+		switch (sceneId) {
+			case 1002:
+				let type = PaoYa.DataCenter.config.game.match_type.filter((item) => {
+					return item.id == params.matchTypeId;
+				})
+				MatchGradeService.startMatch(type);
+				break;
+			case 2003:
+				console.log("5元红包报名")
+				break;
+			case 2005:
+				console.log("人满开赛")
+				break;
+			//天梯匹配加载页
+			case 4001:
+				this.navigator.push('IFHostView')
+				break;
+			case 10001:
+				this.navigator.push('QTRoomView',{rname:params.rname})
+				break
+		}
+	}
+
+	onHide(res) {
+		this.hideRes = res;
+	}
+}

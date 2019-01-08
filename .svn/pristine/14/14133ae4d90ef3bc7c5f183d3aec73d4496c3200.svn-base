@@ -1,0 +1,206 @@
+import MatchGradeView from "../MatchGradeService/MatchGradeView";
+import AlertDialog from "../../dialog/AlertDialog";
+import UserView from "../../prefab/UserView";
+import GameService from '../../utils/GameService';
+import Service from '../../../Service';
+export default class MatchControl extends PaoYa.Component {
+    onAwake() {
+    }
+    onAppear() {
+        this.params = this.owner.params;
+        this.sendMessage(PaoYa.Client.LEAVE_ROOM, { match_type_id: this.params.id });
+        this.startMatch();
+        this.init()
+        if (!window.wx) return       
+        var screenHeight = wx.getSystemInfoSync().screenHeight;
+        var screenWidth = wx.getSystemInfoSync().screenWidth;
+        var WIDTH = screenWidth * 0.8;
+        var HEIGHT = Math.ceil(screenWidth * 0.8 * 0.33);
+        var viewHeight = (screenWidth * Laya.stage.designHeight) / Laya.stage.designWidth;
+        var viewY = (screenHeight - viewHeight) / 2;
+        let bannerParams = {
+            adUnitId: 'adunit-3ba53115d9b84cc1',
+            style: {
+                top: screenHeight - 200,
+                left: 0,
+                width: WIDTH,
+                height: HEIGHT
+            }
+        }
+        this.showBannerAd(bannerParams)
+    }
+    onClick(e) {
+        let _this = this;
+        switch (e.target.name) {
+            case 'back':/**/
+                this.backHandler();
+                break;
+        }
+    }
+    init() {
+        this.matchOk = false;
+        this.isCancel = false;
+        let user = PaoYa.DataCenter.user;
+        this.owner.setMyInfo(
+            {
+                icon: PaoYa.Utils.makeIcon(user.avstar),
+                name: PaoYa.Utils.formatName(user.nickname),
+                gender: user.gender,
+                countWin: 0,
+                city: user.member_city
+            }
+        )
+        this.owner.setOtherInfo({
+            icon: PaoYa.Utils.makeIcon(""),
+            name: "匹配中...",
+            gender: "",
+            countWin: 0,
+            city: ""
+        })
+    }
+    onReceiveMessage(cmd, value) {
+        switch (cmd) {
+            case PaoYa.Client.MATCH_SUCCESS:
+                this.matchSuccessData = value
+                this.matchSuccess(value);
+                break;
+            case PaoYa.Client.MATCH_FAIL:
+                this.matchTimeout();
+                break;
+            case PaoYa.Client.GAME_START_GAME:
+                let data = {
+                    type: PaoYa.GameEntryType.Match,
+                    matchData: this.matchSuccessData,
+                    gameData: value
+                }
+                GameService.startGame(data);
+                break;
+        }
+
+    }
+    changeMatchTypeId(id) {
+        this.params.id = id;
+    }
+    /*开始匹配，发送命令*/
+    startMatch() {
+        this.owner.startMatch();
+        Laya.timer.once(500, this, () => {
+            if (this.isCancel) { return; }
+            this.sendMessage(PaoYa.Client.MATCH_JOIN, { match_type_id: this.params.id });
+        })
+        this.startMatchTimeout();
+    }
+    /*1.匹配成功 2.不参加匹配*/
+    stopMatch(sendCancelCmd) {
+        if (sendCancelCmd === void 0) { sendCancelCmd = true; }
+        this.stopMatchTimeout();
+        if (sendCancelCmd) {
+            this.sendMessage(PaoYa.Client.MATCH_CANCEL, { match_type_id: this.params.id });
+        }
+        this.owner.stopMatch();
+    }
+    startMatchTimeout() {
+        Laya.timer.once(30000, this, this.matchTimeout)
+    }
+    stopMatchTimeout() {
+        Laya.timer.clear(this, this.matchTimeout)
+    }
+    /*1.匹配超时弹框 2.匹配失败弹框*/
+    matchTimeout() {
+        let _this = this;
+        this.stopMatchTimeout();
+        this.stopMatch(false);
+        let alert = new AlertDialog({
+            title: '提示',
+            message: "啊哦~你的实力太强竟没人敢应战~",
+            cancelText: "暂且休战",
+            confirmText: "决战到底",
+            cancelHandler: function () {
+                if (PaoYa.DataCenter.isFromMiniProgram) {
+                    PaoYa.game.exit();
+                } else {
+                    _this.navigator.pop()
+                }
+            },
+            confirmHandler: function () {
+                _this.matchAgain();
+            }
+        })
+        alert.popup();
+    }
+    matchAgain() {
+        this.isCancel = false;
+        this.startMatch();
+    }
+    matchSuccess(value) {
+        if (this.isCancel) {
+            return;
+        }
+        this.matchOk = true;
+        this.stopMatchTimeout();
+        this.owner.stopMatch();
+
+        if (value.match_list[0].user_id != PaoYa.DataCenter.user.id) {
+            value.match_list.push(value.match_list.shift());
+        }
+        this.matchData = value.match_list;
+        let myInfo = this.matchData[0];
+        let otherInfo = this.matchData[1];
+        this.owner.setMyInfo({
+            countWin: (myInfo.continuous_win) ? "remote/win/win-" + myInfo.continuous_win + ".png" : "",
+            city: myInfo.location || ""
+        });
+        this.owner.setOtherInfo({
+            icon: PaoYa.Utils.makeIcon(otherInfo.user_icon),
+            name: PaoYa.Utils.formatName(otherInfo.user_name),
+            gender: (otherInfo.gender) ? otherInfo.gender : "女",
+            city: otherInfo.location || "",
+            countWin: (otherInfo.continuous_win) ? "remote/win/win-" + otherInfo.continuous_win + ".png" : ""
+        })
+        this.owner.showSuccess(() => {
+            let beanBuff = PaoYa.DataCenter.showBeanPercent == 1 ? 1 : 0
+            this.sendMessage(PaoYa.Client.GAME_START_MATCH, { room_name: value.room_name, match_type_id: this.params.id, share: beanBuff })
+        })
+    }
+    backHandler() {
+        let _this = this;
+        this.isCancel = false;
+        this.stopMatch();
+        if (this.matchOk) {
+            let alert = new AlertDialog({
+                title: '提示',
+                message: "是否结束游戏并返回首页~",
+                confirmText: "确定",
+                confirmHandler: function () {
+                    if (PaoYa.DataCenter.isFromMiniProgram) {
+                        PaoYa.game.exit();
+                    } else {
+                        _this.navigator.pop()
+                    }
+                }
+            })
+            alert.popup();
+        } else {
+            let alert = new AlertDialog({
+                title: '提示',
+                message: "很快就能匹配到对手哦~",
+                cancelText: "不等了",
+                confirmText: "再等等",
+                cancelHandler: function () {
+                    if (PaoYa.DataCenter.isFromMiniProgram) {
+                        PaoYa.game.exit();
+                    } else {
+                        _this.navigator.pop()
+                    }
+                },
+                confirmHandler: function () {
+                    _this.matchAgain();
+                }
+            })
+            alert.popup();
+        }
+    }
+    onDestroy() {
+        this.stopMatch();
+    }
+}

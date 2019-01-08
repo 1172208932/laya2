@@ -1,0 +1,342 @@
+{
+    "code": 200,
+    "time": 1543907286,
+    "message": "",
+    "value": {
+        "gender": "男",
+        "member_province": "",
+        "member_city": "",
+        "resurrection_card": 1,
+        "timing_url": "wss://lobby.xingqiu123.com/",
+        "ladder_id": 0,
+        "login_bonus": 0,
+        "lobby_daily_first_login": false,
+        "nickname": "🌠 渡",
+        "mobile_bind_status": 0,
+        "id": 108125,
+        "is_first_game": 0,
+        "member_country": "冰岛",
+        "member_gold": 15796,
+        "wx_bind_status": 1,
+        "isProduction": 1,
+        "is_new": false,
+        "is_show": 1,
+        "token": "ud0Hhhv+4Ek0mn3G+2vpWelog+aifGxzX0wNnbWRG2w=",
+        "game_url": "wss://websocket.xingqiu123.com/",
+        "app_game_url": "ws://websocket.xingqiu123.com:8443/",
+        "member_rmb": "206.00",
+        "member_integral": 965,
+        "is_review": 0,
+        "config_list": {
+            "game": {
+                "match_cost": 10,
+                "match_time_out": "8",
+                "promotion_reward": [
+                    {
+                        "type_id": 3,
+                        "list": [
+                            {
+                                "id": 9,
+                                "rank": "1",
+                                "reward": "2-4.5",
+                                "typeId": 3
+                            },
+                            {
+                                "id": 10,
+                                "rank": "2",
+                                "reward": "2-2",
+                                "typeId": 3
+                            },
+                            {
+                                "id": 11,
+                                "rank": "3",
+                                "reward": "2-1",
+                                "typeId": 3
+                            },
+                            {
+                                "id": 12,
+                                "rank": "4-8",
+                                "reward": "2-0.5",
+                                "typeId": 3
+                            }
+                        ]
+                    },
+                    {
+                        "type_id": 2,
+                        "list": [
+                            {
+                                "id": 4,
+                                "rank": "1",
+                                "reward": "2-5",
+                                "typeId": 2
+                            },
+                            {
+                                "id": 66,
+                                "rank": "2",
+                                "reward": "3-20",
+                                "typeId": 2
+                            },
+                            {
+                                "id": 67,
+                                "rank": "3",
+                                "reward": "3-50",
+                                "typeId": 2
+                            }
+                        ]
+                    }
+                ],
+                "introduce_time": 5,
+                "gophers_hat": "20",
+                "promotion_list": [
+                    {
+                        "match_cost": 10,
+                        "introduce_time": 5,
+                        "icon": "h5help/jyllk.png",
+                        "count": 0,
+                        "free_time": 0,
+                        "game_type": 1,
+                        "interval_time": 5,
+                        "start_time": 1543908000,
+                        "round": 6,
+                        "promotion_pro": "0.6-0.5-0.4-0.3-0.2",
+                        "pet_free_time": 0,
+                        "game_time": 30,
+                        "name": "10元红包场",
+                        "rules_link": "whacamole/new10yuanrule.png",
+                        "id": 3,
+                        "game_start_time": "19:25;19:30;19:35;19:40;19:50;19:55;14:00;14:20;14:40;15:00;15:20;15:40;16:00;16:20"
+                    },
+                    {
+                        "match_cost": 200,
+                        "introduce_time": 5,
+                        "icon": "h5help/stjdb.png",
+                        "count": 4,
+                        "free_time": 0,
+                        "game_type": 2,
+                        "interval_time": 5,
+                        "start_time": 0,
+                        "round": 2,
+                        "pet_free_time": 0,
+                        "game_time": 30,
+                        "name": "1元红包场",
+                        "rules_link": "wxgame/common/1rule.png",
+                        "id": 2,
+                        "game_start_time": "0"
+                    }
+                ],
+                "gophers_action": "1-3-0-10,3-6-10-20",
+                "gophers_add": "6",
+                "ladder_config": [],
+                "share_list": [
+                    "【有人@我】求手速快的朋友助攻，一分钟赚1块钱",
+                    "【有人@我】玩了一局游戏就赚到5.88元！快来跟我组队！",
+                    "【微信新版】全新小游戏开放内测，邀请vip用户马上体验",
+                    "【跳一跳升级版】10000位内测名额开启，体验送红包"
+                ],
+                "game_time": 30,
+                "match_again_outtime": "30",
+                "name": "泡泡打地鼠",
+                "match_type": [
+                    {
+                        "cost": 5,
+                        "name": "新手场",
+                        "limit": "7-50",
+                        "reward_integral": 10,
+                        "quick_limit": "0-32",
+                        "id": 1,
+                        "entry_fee": 2,
+                        "status": 1
+                    },
+                    {
+                        "cost": 20,
+                        "name": "初级场",
+                        "limit": "25-500",
+                        "reward_integral": 10,
+                        "quick_limit": "32-300",
+                        "id": 2,
+                        "entry_fee": 5,
+                        "status": 1
+                    },
+                    {
+                        "cost": 100,
+                        "name": "中级场",
+                        "limit": "120",
+                        "reward_integral": 10,
+                        "quick_limit": "200",
+                        "id": 3,
+                        "entry_fee": 20,
+                        "status": 1
+                    }
+                ],
+                "share_img": [
+                    "wxgame/qrcode/food.png",
+                    "wxgame/qrcode/petgo.png",
+                    "wxgame/qrcode/coupling.png",
+                    "wxgame/qrcode/onlyme.png",
+                    "wxgame/qrcode/xiaoxl.png",
+                    "wxgame/qrcode/reversi.png"
+                ],
+                "id": 1004,
+                "gophers_enemy": "20",
+                "jsonconfig": {
+                    "match_info": {
+                        "ladder": 0,
+                        "pass": 0,
+                        "ordinary": 1,
+                        "share": 1,
+                        "is_jump": 0,
+                        "promotion": 1
+                    },
+                    "unit": "分",
+                    "match_info_app": {
+                        "ladder": 0,
+                        "pass": 0,
+                        "ordinary": 1,
+                        "share": 1,
+                        "is_jump": 0,
+                        "promotion": 1
+                    },
+                    "share_info": [
+                        {
+                            "img": "wxgame/qrcode/petgo.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/men_chong.sk",
+                            "appId": "wx28a78997b4784ef1",
+                            "game_id": "1005"
+                        },
+                        {
+                            "img": "wxgame/qrcode/food.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/mei_shi_jia.sk",
+                            "appId": "wx405ee3ea1e491440",
+                            "game_id": "1006"
+                        },
+                        {
+                            "img": "wxgame/qrcode/reversi.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/fan_fan_le.sk",
+                            "appId": "wx786d0c5f03d1c2fc",
+                            "game_id": "1007"
+                        },
+                        {
+                            "img": "wxgame/qrcode/xiaoxl.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/xiao_xiao_le.sk",
+                            "appId": "wx1fa0ca658a9a0ce6",
+                            "game_id": "1008"
+                        },
+                        {
+                            "img": "wxgame/qrcode/jump.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/tiao_yi_tiao.sk",
+                            "appId": "wxff74aa65beb1ba7e",
+                            "game_id": "1009"
+                        },
+                        {
+                            "img": "wxgame/qrcode/onlyme.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/bi_wu_chang.sk",
+                            "appId": "wxcaae4fff0e46aead",
+                            "game_id": "1011"
+                        },
+                        {
+                            "img": "wxgame/qrcode/coupling.png",
+                            "spine_url": "https://res.xingqiu123.com/wxgame/intro/chai_san_qing_lv.sk",
+                            "appId": "wxa163f2723eef4ea3",
+                            "game_id": "1012"
+                        }
+                    ],
+                    "share_task": "5;1&1-10#3&1-10#5&1-15",
+                    "round_limit_count": "30",
+                    "game_reward": "5-50;8-100",
+                    "tutorial_url": "https://res.xingqiu123.com/APP/home/1.1/game_video_1004.mp4"
+                },
+                "strategy": "连击可以获得更高的得分，所以一定要保证正确率呦！！; 千万不要打到红色的地鼠，因为那样会扣分的！！！; 成功打掉戴帽子的地鼠会获得额外加分，但是也需要连续敲击两次呦！！！",
+                "gophers_normal": "60"
+            },
+            "common_config": {
+                "share_info": [
+                    {
+                        "img": "wxgame/qrcode/petgo.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/men_chong.sk",
+                        "appId": "wx28a78997b4784ef1",
+                        "game_id": 1005
+                    },
+                    {
+                        "img": "wxgame/qrcode/food.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/mei_shi_jia.sk",
+                        "appId": "wx405ee3ea1e491440",
+                        "game_id": 1006
+                    },
+                    {
+                        "img": "wxgame/qrcode/reversi.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/fan_fan_le.sk",
+                        "appId": "wx786d0c5f03d1c2fc",
+                        "game_id": 1007
+                    },
+                    {
+                        "img": "wxgame/qrcode/xiaoxl.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/xiao_xiao_le.sk",
+                        "appId": "wx1fa0ca658a9a0ce6",
+                        "game_id": 1008
+                    },
+                    {
+                        "img": "wxgame/qrcode/jump.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/tiao_yi_tiao.sk",
+                        "appId": "wxff74aa65beb1ba7e",
+                        "game_id": 1009
+                    },
+                    {
+                        "img": "wxgame/qrcode/onlyme.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/bi_wu_chang.sk",
+                        "appId": "wxcaae4fff0e46aead",
+                        "game_id": 1011
+                    },
+                    {
+                        "img": "wxgame/qrcode/coupling.png",
+                        "spine_url": "https://res.xingqiu123.com/wxgame/intro/chai_san_qing_lv.sk",
+                        "appId": "wxa163f2723eef4ea3",
+                        "game_id": 1012
+                    }
+                ],
+                "hall_img": "wxgame/qrcode/hall.png"
+            },
+            "item_list": [
+                {
+                    "pao_gold": 100,
+                    "price": 1.0,
+                    "free_gold": 0,
+                    "id": 13
+                },
+                {
+                    "pao_gold": 600,
+                    "price": 6.0,
+                    "free_gold": 10,
+                    "id": 14
+                },
+                {
+                    "pao_gold": 1800,
+                    "price": 18.0,
+                    "free_gold": 50,
+                    "id": 15
+                },
+                {
+                    "pao_gold": 3000,
+                    "price": 30.0,
+                    "free_gold": 100,
+                    "id": 16
+                },
+                {
+                    "pao_gold": 9800,
+                    "price": 98.0,
+                    "free_gold": 388,
+                    "id": 17
+                },
+                {
+                    "pao_gold": 19800,
+                    "price": 198.0,
+                    "free_gold": 1288,
+                    "id": 18
+                }
+            ]
+        },
+        "avstar": "https://wx.qlogo.cn/mmopen/vi_32/VpuZA6enbYCicRZgglFhGwTumTSSibrMVt9HL21Jv0Ome3bIdsK87frqX4h8u7yyqgzgLZb4C8LKTyUgJf4hGIaw/132",
+        "age": 18,
+        "is_receive_boy": 0,
+        "app_timing_url": "ws://lobby.xingqiu123.com:8443/"
+    }
+}

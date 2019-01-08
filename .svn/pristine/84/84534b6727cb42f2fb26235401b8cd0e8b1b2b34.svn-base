@@ -1,0 +1,1 @@
+{"type":"Image","props":{"y":0,"x":0,"width":150,"presetID":1,"mouseEnabled":true,"isPresetRoot":true,"height":150},"compId":121,"child":[{"type":"Script","props":{"presetID":2,"runtime":"scripts/prefab/SkipMall.js"},"compId":123}],"loadList":[],"loadList3D":[]}

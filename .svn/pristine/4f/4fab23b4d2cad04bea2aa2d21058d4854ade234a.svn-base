@@ -1,0 +1,42 @@
+import GameResultControl from "../common/GameResult/GameResultControl";
+
+export default class DoubleDialog extends Laya.Dialog {
+    onAwake() {
+        this.setRatio()
+        this.btnDouble.on(Laya.Event.CLICK, this, this.addClick)
+    }
+    setRatio() {
+        if (this.params.ratioType != 2) {
+            this.imgIcon.skin = 'remote/share/fen_xiang.png'
+            this.imgIcon.pos(450, 633)
+        }
+        this.diploid.text = `${this.params.ratioInfo}倍领取`
+    }
+    addClick() {
+        var _this = this
+        let content = PaoYa.DataCenter.config.game.share_list.randomItem;
+        if (this.params.ratioType != 2) {
+            PaoYa.ShareManager.shareTitle(content, {}, (res) => {
+                PaoYa.NotificationCenter.postNotification('double')
+                this.close()
+            })
+        } else {
+            let params = {
+                onClose: function (res) {
+                    if (res.isEnded) {
+                        PaoYa.NotificationCenter.postNotification('double')
+                        _this.close()
+                    }
+                },
+                onError: function (res) {
+                    let errorDialog = new AlertDialog({
+                        title: "温馨提示",
+                        message: res.errMsg
+                    })
+                    errorDialog.popup()
+                }
+            }
+            PaoYa.RewardedVideoAd.show(params);
+        }
+    }
+}

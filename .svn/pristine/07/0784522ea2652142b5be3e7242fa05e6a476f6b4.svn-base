@@ -1,0 +1,56 @@
+import GameConfig from "./GameConfig";
+import Utils from "./scripts/utils/utils";
+import config from './Config'
+import GameMain from "./scripts/common/GameMain";
+export class Main extends GameMain {
+	constructor() {
+		var params = {
+			gameId: 1004,
+			// baseURL: "https://wxapi.xingqiu123.com/ServiceCore/",
+			baseURL: "http://47.96.1.255:8080/ServiceCore/",
+			zone: "susliks",
+			showStat: true,
+			showDebugTool: true,
+			userId: 159278,
+			offerId: "1450014295",
+			version: config.version,
+			rankingType: PaoYa.RankingType.Score,
+			release: config.release
+		};
+		super(params)
+	}
+	setupConfig() {
+		if (window.wx) {
+			var fundebug = loadLib('./libs/fundebug.0.4.0.min.js')
+			fundebug.init({
+				apikey: "07c7c275d630fdb661b6c24852946b3b9b9e307e9624e8c747a4adf560e7028b",
+				silent: config.debug,
+				setSystemInfo: true,
+				silentHttp: true,
+				metaData: {
+					gameId: this.params.gameId,
+                    platform:(window.wx)?"wx":"qq"
+				}
+			});
+		}
+		PaoYa.DataCenter.isNew = this.gameId >= 1020;
+		//分享地址
+		PaoYa.ShareManager.imageURL = "https://res.xingqiu123.com/whacamole/share_icon.png";
+		PaoYa.DataCenter.GAMERES = [
+		 "https://res.xingqiu123.com/wxgame/ladder/win_lose.sk",
+		 "https://res.xingqiu123.com/wxgame/ladder/win_lose.png",
+		 "https://res.xingqiu123.com/wxgame/service/jian_tou.sk",
+		 "https://res.xingqiu123.com/wxgame/service/jian_tou.png"
+		];
+		PaoYa.DataCenter.GAMEPREPARE = null
+	}
+	onShareAppMessage() {
+		return {
+			title: PaoYa.DataCenter.config.game.share_list.randomItem,
+			imageUrl: PaoYa.ShareManager.imageURL,
+			query: ""
+		}
+	}
+}
+//激活启动类
+new Main();

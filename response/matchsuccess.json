@@ -1,0 +1,41 @@
+{
+    "code": 200,
+    "time": 1544076725,
+    "message": "",
+    "value": {
+        "room_name": "66521_108125",
+        "match_list": [
+            {
+                "wx_num": "",
+                "ladder_id": 0,
+                "isRobot": 0,
+                "gender": "男",
+                "user_id": 108125,
+                "user_name": "渡",
+                "dressup_id": 1,
+                "user_icon": "https://wx.qlogo.cn/mmopen/vi_32/VpuZA6enbYCicRZgglFhGwTumTSSibrMVt9HL21Jv0Ome3bIdsK87frqX4h8u7yyqgzgLZb4C8LKTyUgJf4hGIaw/132",
+                "location": " ",
+                "continuous_win": 0,
+                "age": 0
+            },
+            {
+                "wx_num": "",
+                "ladder_id": 0,
+                "isRobot": 1,
+                "user_id": 66521,
+                "user_name": "雪狼",
+                "dressup_id": 1,
+                "user_icon": "robot/66521",
+                "location": "海南 琼海",
+                "continuous_win": 1,
+                "age": 30
+            }
+        ],
+        "match_type_id": 10,
+        "first_id": "108125",
+        "source_type": 2,
+        "game_id": 1016
+    },
+    "command": "matchsuccess",
+    "m_id": "1544076718651"
+}

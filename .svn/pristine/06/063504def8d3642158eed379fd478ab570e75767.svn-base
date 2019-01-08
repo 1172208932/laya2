@@ -1,0 +1,51 @@
+import Utils from "../utils/utils";
+
+export default class WxIcon extends PaoYa.Component {
+    /** @prop {name:image,tips:"",type:Node}*/
+    onAwake() {
+        this.image.visible = false
+        PaoYa.NotificationCenter.addLoginNotification(this, function () {
+            this.initView()
+        })
+    }
+    onClick() {
+        PaoYa.DataTrack.trackType(PaoYa.DataTrackType.Jump)
+        this.navigateToMiniProgram()
+    }
+    initView() {
+        let sk = new Laya.Skeleton()
+        sk.width = 130;
+        sk.height = 130;
+        sk.pos(65, 65)
+        this.skeleton = sk
+        this.owner.addChild(sk)
+        this.reloadData()
+    }
+    reloadData() {
+        var config = PaoYa.DataCenter.config;
+        this.info = config.common_config.share_info.randomItem;
+        var url = this.info.spine_url;
+        this.skeleton.load(url, Laya.Handler.create(this, function () {
+            this.skeleton.play();
+        }))
+    }
+    navigateToMiniProgram() {
+        var _this = this;
+        if (!this.info) { return }
+        Utils.navigateToMiniProgram({
+            appId: _this.info.appId,
+            images: [_this.info.img]
+        });
+    }
+    onAppear() {
+        if (PaoYa.DataCenter.config) {
+            this.reloadData()
+        }
+    }
+    onDisappear() {
+        this.skeleton.stop()
+    }
+    onDestroy() {
+        this.skeleton.destroy()
+    }
+}

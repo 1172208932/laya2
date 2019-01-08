@@ -1,0 +1,60 @@
+import GameResultControl from "../common/GameResult/GameResultControl";
+
+export default class DoubleDialog extends Laya.Dialog {
+    onAwake() {
+        this.setRatio()
+        this.btnDouble.on(Laya.Event.CLICK, this, this.addClick)
+    }
+    setRatio() {
+        if (this.params.ratioType != 2) {
+            this.imgIcon.skin = 'remote/share/fen_xiang.png'
+            this.imgIcon.pos(450, 633)
+        }
+        this.diploid.text = `${this.params.ratioInfo}倍领取`
+    }
+    addClick() {
+        var _this = this
+        let content = PaoYa.DataCenter.config.game.share_list.randomItem;
+        if (this.params.ratioType != 2) {
+            PaoYa.ShareManager.shareTitle(content, {}, (res) => {
+                if (res.data.ret == 0) {
+                    if (res.data.shareTo == 0 || res.data.shareTo == 1) {
+                        PaoYa.NotificationCenter.postNotification('double')
+                    } else {
+                        let dialog = new AlertDialog({
+                            title: "温馨提示",
+                            message: '分享给QQ好友或分享到QQ空间，\n成功才能领取多倍奖励哦！',
+                            confirmText: '好的'
+                        })
+                        dialog.popup()
+                    }
+                } else {
+                    let dialog = new AlertDialog({
+                        title: "温馨提示",
+                        message: '分享给QQ好友或分享到QQ空间，\n成功才能领取多倍奖励哦！',
+                        confirmText: '好的'
+                    })
+                    dialog.popup()
+                }
+                this.close()
+            })
+        } else {
+            let params = {
+                onClose: function (res) {
+                    if (res.isEnded) {
+                        PaoYa.NotificationCenter.postNotification('double')
+                        _this.close()
+                    }
+                },
+                onError: function (res) {
+                    let errorDialog = new AlertDialog({
+                        title: "温馨提示",
+                        message: res.message
+                    })
+                    errorDialog.popup()
+                }
+            }
+            PaoYa.RewardedVideoAd.show(params);
+        }
+    }
+}

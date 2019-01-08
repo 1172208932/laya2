@@ -1,0 +1,36 @@
+{
+    "code": 200,
+    "time": 1544077881,
+    "message": "",
+    "value": {
+        "result": "success",
+        "invite_user": {
+            "wx_num": "",
+            "ladder_id": 0,
+            "gender": "男",
+            "user_id": 102434,
+            "user_name": "张晓旭",
+            "dressup_id": 1,
+            "user_icon": "": "https://wx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTKILsf01ibBCFX92A0AfJTXWOmmbHIgvxgZIvs9ia4tDa7b5tZTMJvEEYWBGSVtQyHGFvy9K96ndtiaA/132",
+            "l",
+            "location": "黑龙江 哈尔滨",
+            "age": 0
+        },
+        "first_id": "102434",
+        "receive_user": {
+            "wx_num": "",
+            "ladder_id": 0,
+            "gender": "男",
+            "user_id": 108125,
+            "user_name": "🌠 渡",
+            "dressup_id": 1,
+            "user_icon": "": "https://wx.qlogo.cn/mmopen/vi_32/ECOJ2KphCSiajao15elMo77txvPhpMqhLFsF2MOPM1FJxmVYRlSQCdv8icicPCPic69ibOQFIewKibMmgkQtokAEibrxA/132",
+            "l",
+            "location": " ",
+            "age": 0
+        },
+        "status": 1
+    },
+    "command": "receive_invite",
+    "m_id": "1544077870407"
+}

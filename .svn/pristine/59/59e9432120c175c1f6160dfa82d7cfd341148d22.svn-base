@@ -1,0 +1,1 @@
+{"type":"Image","props":{"y":0,"x":0,"var":"bt_goHall","skin":"local/common/jump-hall.png","presetID":1,"isPresetRoot":true},"compId":37,"child":[{"type":"Script","props":{"presetID":2,"runtime":"scripts/prefab/ReturnHall.js"},"compId":39}],"loadList":["local/common/jump-hall.png"],"loadList3D":[]}

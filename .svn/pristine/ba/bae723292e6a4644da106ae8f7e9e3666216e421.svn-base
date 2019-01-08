@@ -1,0 +1,149 @@
+import Utils from "../../utils/utils";
+import MatchGradeService from "../MatchGradeService/MatchGradeService";
+import GameAgainControl from "./GameAgainControl";
+import AlertDialog from "../../dialog/AlertDialog";
+export default class GameResultControl extends PaoYa.Component {
+    constructor() { super(); }
+    onAwake() {
+        this.gameType = this.owner.params.type;
+        this.params = this.owner.params.result;
+        this.init();
+        let bannerParams = {
+            style: {
+                x: 0,
+                y: 0
+            }
+        }
+        this.showBannerAd(bannerParams)
+    }
+    init() {
+        let userId = PaoYa.DataCenter.user.id
+        if (userId == this.params.lose_user.user_id) {
+            this.myInfo = this.params.lose_user;
+        } else {
+            this.myInfo = this.params.win_user;
+        }
+        if (this.myInfo.is_reward) {
+            this.showRewardDialog();
+        }
+        if (this.gameType == PaoYa.GameEntryType.Friend) {
+            for(var i=0; i<this.owner.boxWxIcon.numChildren; i++){
+                var wxIcon=this.owner.boxWxIcon.getChildAt(i);
+                wxIcon.visible=false;
+            }
+            this.owner.getComponent(GameAgainControl).enabled = true;
+        }
+    }
+    showRewardDialog() {
+        let _this = this;
+        let message = `玩游戏,赚积分,积分可以兑换泡泡玩偶、抱枕等定制产品哦!`;
+        let rewardDialog = new AlertDialog({
+            title: "提示",
+            message: message,
+            cancelText: "继续游戏",
+            confirmText: "分享好友",
+            confirmHandler: function () {
+                let title = PaoYa.DataCenter.config.game.share_list.randomItem;
+                _this.shareTitle(title, {}, function () {
+                })
+            }
+        });
+        rewardDialog.popup();
+        this.rewardDialog = rewardDialog;
+    }
+    onClick(e) {
+        switch (e.target.name) {
+            case "share":
+                this.shareHandler();
+                break;
+            case "again":
+                this.againHandler();
+                break;
+            case "back":
+                this.backHandler();
+                break;
+        }
+    }
+    onReceiveMessage(cmd, value) {
+        switch (cmd) {
+            //积分 
+            case "shareaward":
+                PaoYa.Toast.show('恭喜获得' + value.integral + '积分，积分可以兑换奖品哦！', 3000);
+                break;
+            case PaoYa.Client.DISCONNECT:
+                if (this.gameType == PaoYa.GameEntryType.Friend) {
+                    this.owner.btnAgain.disabled = true;
+                }
+                break;
+        }
+    }
+    backHandler() {
+        this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+        if (PaoYa.DataCenter.isFromMiniProgram) {
+            PaoYa.game.exit();
+        } else {
+            //跳到匹配场次选择界面
+            if (this.gameType == PaoYa.GameEntryType.Friend) {
+                this.navigator.popToRootScene();
+            } else {
+                this.navigator.popToScene("MatchGradeView");
+            }
+        }
+    }
+    shareHandler() {
+        var _this = this;
+        if (this.owner.btnShare.label == "换换手气") {
+            PaoYa.DataTrack.trackType(PaoYa.DataTrackType.Change)
+            this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+            if (PaoYa.DataCenter.isFromMiniProgram) {
+                PaoYa.game.exit();
+            } else {
+                var Info = PaoYa.DataCenter.config.common_config.share_info.randomItem;
+                Utils.navigateToMiniProgram({
+                    appId: Info.appId,
+                    images: [Info.img]
+                });
+            }
+            return;
+        }
+
+        let content = PaoYa.DataCenter.config.game.share_list.randomItem;
+        if (this.owner.btnShare.label.indexOf('积分') > -1) {
+            if (this.owner.ratioType != 2) {
+                this.shareTitle(content, {}, () => {
+                    this.sendShareAward()
+                }, (msg) => {
+                    PaoYa.Toast.showError(msg)
+                })
+            } else {
+                Utils.goToAds(() => {
+                    this.sendShareAward()
+                })
+            }
+        } else {
+            this.shareTitle(content, {}, function () { });
+        }
+    }
+    sendShareAward() {
+        this.sendMessage('shareaward', {});
+        this.owner.btnShare.label = '炫耀一下';
+    }
+    againHandler() {
+        this.GET("update_chips", function (data) {
+            PaoYa.DataCenter.user.gold = data.pao_gold;
+            if (this.gameType == PaoYa.GameEntryType.Match) {//重新走匹配
+                let type = MatchGradeService.type;
+                MatchGradeService.checkIfMatch(type);
+            } else if (this.gameType == PaoYa.GameEntryType.Friend) {
+                //邀请对方再来一局
+                this.owner.getComponent(GameAgainControl).showGameAgain();
+            }
+        })
+    }
+    onDestroy() {
+        if (this.rewardDialog) {
+            this.rewardDialog.close();
+            this.rewardDialog = null;
+        }
+    }
+}

@@ -1,0 +1,53 @@
+{
+    "code": 200,
+    "time": 1545014715,
+    "message": "",
+    "value": {
+        "wheel_do_user_id": 66452,
+        "wheel_reward": 100,
+        "win_userid": 66452,
+        "wheel_time": 10,
+        "wheel_user_id": 66452,
+        "lose_user": {
+            "user_status": 1,
+            "gender": "男",
+            "city": "",
+            "user_name": "Clarence",
+            "total_wins": 65,
+            "win_chang": 47,
+            "maxScore": 0,
+            "round_limit": 0,
+            "score": 0,
+            "is_reward": 0,
+            "pao_gold": -50,
+            "province": "",
+            "user_id": 148009,
+            "reward_ratio": "3-1",
+            "integral": 1,
+            "finish_round": 1,
+            "reward_gold": 0,
+            "user_icon": "https://wx.qlogo.cn/mmopen/vi_32/v8RV7DMibJWH8wxnMZZx1ibaX4nIIvGtKvmuxa4hWoxZjGGbERruLib3dxTvibmeIBt82Fk6a2NearzJUQBicO83Uww/132"
+        },
+        "win_user": {
+            "user_status": 1,
+            "city": "北区",
+            "user_name": "苏久囤",
+            "total_wins": 1,
+            "win_chang": 85,
+            "maxScore": 3300,
+            "round_limit": 0,
+            "score": 3300,
+            "is_reward": 0,
+            "pao_gold": 50,
+            "province": "香港",
+            "user_id": 66452,
+            "reward_ratio": "5-2",
+            "integral": 10,
+            "finish_round": 1,
+            "reward_gold": 0,
+            "user_icon": "robot/66452"
+        }
+    },
+    "command": "endpk",
+    "m_id": "1545014709384"
+}
