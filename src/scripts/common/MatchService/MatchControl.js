@@ -11,23 +11,7 @@ export default class MatchControl extends PaoYa.Component {
         this.sendMessage(PaoYa.Client.LEAVE_ROOM, { match_type_id: this.params.id });
         this.startMatch();
         this.init()
-        if (!window.wx) return       
-        var screenHeight = wx.getSystemInfoSync().screenHeight;
-        var screenWidth = wx.getSystemInfoSync().screenWidth;
-        var WIDTH = screenWidth * 0.8;
-        var HEIGHT = Math.ceil(screenWidth * 0.8 * 0.33);
-        var viewHeight = (screenWidth * Laya.stage.designHeight) / Laya.stage.designWidth;
-        var viewY = (screenHeight - viewHeight) / 2;
-        let bannerParams = {
-            adUnitId: 'adunit-3ba53115d9b84cc1',
-            style: {
-                top: screenHeight - 200,
-                left: 0,
-                width: WIDTH,
-                height: HEIGHT
-            }
-        }
-        this.showBannerAd(bannerParams)
+        this.showBannerAd({})
     }
     onClick(e) {
         let _this = this;
@@ -161,8 +145,7 @@ export default class MatchControl extends PaoYa.Component {
             countWin: (otherInfo.continuous_win) ? "remote/win/win-" + otherInfo.continuous_win + ".png" : ""
         })
         this.owner.showSuccess(() => {
-            let beanBuff =1
-            //  PaoYa.DataCenter.showBeanPercent == 1 ? 1 : 0
+            let beanBuff =PaoYa.DataCenter.showBeanPercent == 1 ? 1 : 0 
             this.sendMessage(PaoYa.Client.GAME_START_MATCH, { room_name: value.room_name, match_type_id: this.params.id, share: beanBuff })
         })
     }

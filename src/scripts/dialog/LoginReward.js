@@ -1,4 +1,5 @@
-export default class LoginReward extends Laya.Dialog {
+export default class LoginReward extends PaoYa.Dialog {
+    //登录奖励弹框
     initData(data) {
         data.login_bonus_list.forEach((item, index) => {
             if (item.pao_gold == '0') {

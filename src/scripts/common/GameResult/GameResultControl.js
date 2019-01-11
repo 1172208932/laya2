@@ -8,7 +8,6 @@ export default class GameResultControl extends PaoYa.Component {
         this.gameType = this.owner.params.type;
         this.params = this.owner.params.result;
         this.init();
-        this.showBannerAd({})
     }
     init() {
         let userId = PaoYa.DataCenter.user.id
@@ -18,10 +17,6 @@ export default class GameResultControl extends PaoYa.Component {
             this.myInfo = this.params.win_user;
         }
         if (this.gameType == PaoYa.GameEntryType.Friend) {
-            for (var i = 0; i < this.owner.boxWxIcon.numChildren; i++) {
-                var wxIcon = this.owner.boxWxIcon.getChildAt(i);
-                wxIcon.visible = false;
-            }
             this.owner.getComponent(GameAgainControl).enabled = true;
         }
         this.onNotification("double", this, () => {
@@ -64,6 +59,7 @@ export default class GameResultControl extends PaoYa.Component {
                 this.navigator.popToRootScene();
             } else {
                 this.navigator.popToScene("MatchGradeView");
+                this.navigator.popup('CrossLinkDialog')
             }
         }
     }
@@ -76,15 +72,20 @@ export default class GameResultControl extends PaoYa.Component {
             if (PaoYa.DataCenter.isFromMiniProgram) {
                 PaoYa.game.exit();
             } else {
-                var Info = PaoYa.DataCenter.config.common_config.share_info.randomItem;
-                Utils.navigateToMiniProgram({
-                    appId: Info.appId,
-                    images: [Info.img]
-                });
+                this.navigator.popup('CrossLinkDialog')
             }
             return;
         }
-        this.shareTitle(content, {}, function () { });
+        if (this.owner.btnShare.label == "炫耀一下") {
+            this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+            if (PaoYa.DataCenter.isFromMiniProgram) {
+                PaoYa.game.exit();
+            } else {
+                this.shareTitle(content, {}, function () { });
+            }
+            return;
+        }
+        this.navigator.push('IFHostView')
     }
     sendShareAward() {
         this.sendMessage('shareaward', {});

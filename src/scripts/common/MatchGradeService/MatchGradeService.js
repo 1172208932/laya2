@@ -78,17 +78,7 @@ MatchGradeService.checkIfRoundLimit = function () {
 MatchGradeService.checkWithMiddle = function (cost) {
     let gold = PaoYa.DataCenter.user.gold
     if (gold < cost) {
-        let message = `您可以去其他场次赢豆子哦!\n下载"泡泡游戏"app，每日签到领豆子!`;
-        let alert = new AlertDialog({
-            title: `豆子不足`,
-            message: message,
-            cancelText: `发送"1"下载`,
-            confirmText: `跳过`,
-            cancelHandler: function () {
-                Utils.openCustomer();
-            },
-        }) 
-        alert.popup()
+        PaoYa.navigator.popup('NotEnoughDialog')
         return false
     }
     return true

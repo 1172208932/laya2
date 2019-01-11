@@ -1,4 +1,5 @@
-export default class ThanksDialog extends Laya.Dialog {
+export default class ThanksDialog extends PaoYa.Dialog {
+    //强制弹框必须看广告
     constructor(params) {
         super()
         this.params = params

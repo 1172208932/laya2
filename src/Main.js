@@ -16,7 +16,8 @@ export class Main extends GameMain {
 			version: config.version,
 			rankingType: PaoYa.RankingType.Score,
 			release: config.release,
-            bannerUnitId: 'adunit-3ba53115d9b84cc1',
+			bannerUnitId: 'adunit-3ba53115d9b84cc1',
+			loadNetworkRes: false
 		};
 		super(params)
 	}

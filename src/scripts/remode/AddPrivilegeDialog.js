@@ -1,6 +1,7 @@
 import AlertDialog from "../dialog/AlertDialog";
 
-export default class AddPrivilegeDialog extends Laya.Dialog {
+export default class AddPrivilegeDialog extends PaoYa.Dialog {
+    //开局特权弹框积分mode: 1或者豆子 mode: 0
     constructor(params) {
         super()
         this.params = params
@@ -20,16 +21,21 @@ export default class AddPrivilegeDialog extends Laya.Dialog {
         lblTitle.y = 30
         this.addChild(lblTitle)
 
-        let lblGiveUp = new Laya.Label('放弃')
-        lblGiveUp.fontSize = 20
+        let lblGiveUp = new Laya.Label('放弃特权')
+        lblGiveUp.fontSize = 30
         lblGiveUp.color = '#5d5d5d'
-        lblGiveUp.pos(18, 343)
-        lblGiveUp.name = Laya.Dialog.NO
-        this.lblGiveUp = lblGiveUp
+        lblGiveUp.pos(12, 318)
         this.addChild(lblGiveUp)
 
+        let giveUp = new Laya.Button()
+        giveUp.pos(0, 308)
+        giveUp.size(145, 56)
+        giveUp.name = Laya.Dialog.NO
+        this.giveUp = giveUp
+        this.addChild(giveUp)
+
         let btnOk = new Laya.Button('remote/share/but_01.png')
-        btnOk.pos(94, 252)
+        btnOk.pos(151, 252)
         btnOk.labelSize = 35
         btnOk.labelColors = '#ffffff'
         btnOk.stateNum = 1
@@ -37,7 +43,7 @@ export default class AddPrivilegeDialog extends Laya.Dialog {
         this.addChild(btnOk)
 
         let imgIcon = new Laya.Image('remote/share/guang_gao.png')
-        imgIcon.pos(330, 282)
+        imgIcon.pos(387, 282)
         this.imgIcon = imgIcon
         this.addChild(imgIcon)
 
@@ -45,9 +51,8 @@ export default class AddPrivilegeDialog extends Laya.Dialog {
         lblBtn.fontSize = 38
         lblBtn.color = '#ffffff'
         lblTitle.bold = true
-        lblBtn.pos(143, 289)
+        lblBtn.pos(200, 289)
         this.addChild(lblBtn)
-
 
         let lblText = new Laya.Label('是否使用特权，')
         lblText.fontSize = 30
@@ -83,7 +88,7 @@ export default class AddPrivilegeDialog extends Laya.Dialog {
             html += "<span style='color:green'>-10%</span>";
             p.innerHTML = html;
             this.imgIcon.skin = 'remote/share/fen_xiang.png'
-            this.imgIcon.pos(341, 275)
+            this.imgIcon.pos(398, 275)
         }
         this.btnOk.on(CLICK, this, () => {
             if (this.params.mode == 1) {
@@ -92,7 +97,7 @@ export default class AddPrivilegeDialog extends Laya.Dialog {
                 this.videoMethod()
             }
         })
-        this.lblGiveUp.on(CLICK, this, () => {
+        this.giveUp.on(CLICK, this, () => {
             this.params.cancelHandler && this.params.cancelHandler()
         })
     }

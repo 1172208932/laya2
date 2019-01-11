@@ -1,12 +1,13 @@
 import Utils from "../utils/utils";
-import MatchGradeService from "../common/MatchGradeService/MatchGradeService";
 
-export default class CrossLinkControl extends PaoYa.Component {
+export default class OtherGameList extends PaoYa.Component {
+    //结算页底部跳转其他游戏组件
     onAwake() {
-        if (this.owner.params) { this.gameType = this.owner.params.type; }
+        this.list = this.owner.getChildByName('list')
+        this.setListView()
         this.GET('game_whole_list', (res) => {
             let promise = new Promise((resolve, reject) => {
-                Utils.loadOtherGameList(8, resolve)
+                Utils.loadOtherGameList(4, resolve)
             });
             promise.then((data) => {
                 this.spineInfo = data
@@ -14,23 +15,31 @@ export default class CrossLinkControl extends PaoYa.Component {
             });
         })
     }
-    onThrottleClick(e) {
-        if (e.target.name == 'again') {
-            this.againHandler();
+    setListView() {
+        let _this = this
+        this.list.mouseHandler = new Laya.Handler(this, onSelect, [this.list]);
+        function onSelect(list, e, index) {
+            if (e.type == Laya.Event.CLICK) {
+                _this.clickGameList(this.list.array[index], index)
+            }
         }
+    }
+    setListData(list) {
+        this.list.array = list;
+        this.list.refresh()
     }
     setData(res) {
         let list = []
         res.forEach(element => {
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 4; i++) {
                 if (element.appId == this.spineInfo[i]) {
                     list.push({ name: element.name, icon: `https://res.xingqiu123.com/img/xcx/gameHall_2.0/home/game_icon_${element.id}.png`, id: element.id, appId: element.appId, image: element.qr_img })
                 }
             }
         });
-        this.owner.setListData(list)
+        this.setListData(list)
     }
-    gameClick(data, index) {
+    clickGameList(data, index) {
         this.POST('point_log_record', { point_name: `play00${index + 1}`, point_extra: data.id, point_type: 'crossLink' }, (res) => {
         })
         Utils.navigateToMiniProgram({
@@ -39,17 +48,6 @@ export default class CrossLinkControl extends PaoYa.Component {
             extraData: {
                 jType: 'crossLink',
                 fid: PaoYa.DataCenter.loginData.config_list.game.id
-            }
-        })
-    }
-    againHandler() {
-        PaoYa.DataCenter.showBeanPercent = 0
-        this.GET("update_chips", (data) => {
-            this.owner.close()
-            PaoYa.DataCenter.user.gold = data.pao_gold;
-            if (this.gameType == PaoYa.GameEntryType.Match) {//重新走匹配
-                let type = MatchGradeService.type;
-                MatchGradeService.checkIfMatch(type);
             }
         })
     }

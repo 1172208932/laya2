@@ -1,5 +1,5 @@
 import PrizeShowView from "../utils/PrizeService";
-export default class TaskReward extends Laya.Dialog {
+export default class TaskReward extends PaoYa.Dialog {
     onOpened(data) {
         this.prizes = data.prizes;
         this.setPrizes(200, data.prizes);

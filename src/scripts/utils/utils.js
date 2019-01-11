@@ -4,40 +4,12 @@ export default class Utils {
     static checkIfHasEnoughMoney(cost) {
         let gold = PaoYa.DataCenter.user.gold
         if (gold < cost) {
-            let message = `观看广告免费得豆子;\n下载"泡泡游戏"app，每日签到领豆子!`;
-            let btnText = "领豆子";
-            let alert = new AlertDialog({
-                title: `豆子不足`,
-                message: message,
-                cancelText: `发送"1"下载`,
-                confirmText: "领豆子",
-                cancelHandler: function () {
-                    Utils.openCustomer();
-                },
-                confirmHandler: function () {
-                    PaoYa.RewardedVideoAd.show({
-                        onClose(res) {
-                            if (res.isEnded) {
-                              Utils.adsForReward();
-                            }
-                        },
-                        onError(res) {
-                            let errorDialog = new AlertDialog({
-                                title: "温馨提示",
-                                message: res.errMsg
-                            })
-                            errorDialog.popup()
-                        }
-                    });
-                }
-
-            })
-            alert.popup()
+            PaoYa.navigator.popup('NotEnoughDialog')
             return false
         }
         return true
     }
-    static adsForReward(){
+    static adsForReward() {
         PaoYa.Request.GET("ads_reward", {}, function (data) {
             var alert = new AlertDialog({
                 title: '恭喜',
@@ -191,9 +163,9 @@ export default class Utils {
             alert.popup();
         } else if (Laya.Browser.onIOS) {
             let alert = new AlertDialog({
-                title: '温馨提示',
-                message: "iOS暂未开放充值\n下载泡泡游戏app，每日签到领豆子。",
-                cancelText: `发送"1"下载`,
+                title: '领取豆子',
+                message: "关注“泡泡游戏”公众号，免费领豆子，还能抢先玩游戏哦。",
+                cancelText: `发送"1"关注`,
                 confirmText: "跳过",
                 cancelHandler: function () {
                     Utils.openCustomer();
@@ -250,5 +222,17 @@ export default class Utils {
     };
     static openCustomer() {
         py.openCustomerServiceConversation()
+    }
+    static loadOtherGameList(num, resolve) {
+        Laya.loader.load('gameConfig.json', Laya.Handler.create(this, (res) => {
+            res.navigateToMiniProgramAppIdList ? this.appId = res.navigateToMiniProgramAppIdList : console.error('请在gameConfig中设置游戏白名单')
+            let shareInfo = JSON.parse(JSON.stringify(this.appId));
+            let spineInfo = [];
+            for (let i = 0; i < num; i++) {
+                var rand = Math.floor(Math.random() * shareInfo.length);
+                spineInfo.push(shareInfo.splice(rand, 1)[0]);
+            }
+            resolve(spineInfo);
+        }))
     }
 }

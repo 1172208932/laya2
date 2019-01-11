@@ -1,6 +1,7 @@
 import GameResultControl from "../common/GameResult/GameResultControl";
 
-export default class DoubleDialog extends Laya.Dialog {
+export default class DoubleDialog extends PaoYa.Dialog {
+    //多倍积分弹框
     onAwake() {
         this.setTimes()
         this.btnDouble.on(Laya.Event.CLICK, this, this.addClick)

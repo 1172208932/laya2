@@ -12,18 +12,6 @@ export default class HomeControl extends PaoYa.Component {
             }
             PaoYa.DataCenter.shareWxIcon = PaoYa.DataCenter.config.common_config.share_info;
         })
-        let dialog = new AddPrivilegeDialog({
-            mode: 1,
-            confirmHandler: function () {
-                /* 用于转盘页积分加成显示 */
-                PaoYa.DataCenter.showIntegralPercent = 1
-                cb && cb(type)
-            },
-            cancelHandler: function () {
-                cb && cb(type)
-            }
-        })
-        dialog.popup()
     }
     onClick(e) {
         switch (e.target.name) {

@@ -1,26 +1,12 @@
 import CrossLinkControl from "./CrossLinkControl";
-import Utils from "../utils/utils";
 
-export default class CrossLinkDialog extends PaoYa.Dialog{
-    //交叉跳转弹框
+export default class CrossLinkDialog extends Laya.Dialog{
     onAwake(){
-        this.list.array = [];
-        if(this.params){
-            Laya.timer.once(2000,this,()=>{
-                this.btnMatch.visible = true
-            })
-        }else{
-            this.addCloseBtn()
-        }
+        Laya.timer.once(2000,this,()=>{
+            this.btnMatch.visible = true
+        })
         this.control = this.getComponent(CrossLinkControl)
         this.setListView()
-    }
-    addCloseBtn(){
-        let btn = new Laya.Button('local/common/btn-yellow-close.png')
-        btn.pos(657,312)
-        btn.name = Laya.Dialog.NO
-        btn.stateNum =1
-        this.addChild(btn)
     }
     setListView(){
         let _this = this

@@ -118,7 +118,7 @@ export default class GameResultView extends PaoYa.View {
         this.lblPercent.parent.visible = false;
         if (this.data.has_wheel_reward) {
             this.lblBeanOther.parent.removeSelf();
-            PaoYa.DataCenter.loginData.last_win = 1  
+            PaoYa.DataCenter.loginData.last_win = 1
             this.lblBean.text = '+' + this.data.wheel_reward;
             if (PaoYa.DataCenter.showBeanPercent == 1) {
                 let imgBuff = new Laya.Image('remote/share/red_20.png')
@@ -136,6 +136,9 @@ export default class GameResultView extends PaoYa.View {
             this.lblBean.parent.removeSelf();
             PaoYa.DataCenter.loginData.last_win = 0
             this.lblBeanOther.text = '+' + this.data.wheel_reward;
+        }
+        if (this.data.result != 1) {
+            this.btnShare.label = "换换手气";
         }
     }
     showBattleInfo() {
@@ -165,9 +168,7 @@ export default class GameResultView extends PaoYa.View {
         } else {
             this.imgTitle.skin = 'remote/result/victory1.png'
         }
-        if (this.data.result != 1) {
-            this.btnShare.label = "换换手气";
-        }
+        this.btnShare.label = "炫耀一下"
     }
     showBothInfo() {
         this.imgMyIcon.texture = PaoYa.Utils.makeIcon(this.myInfo.user_icon);

@@ -12,15 +12,15 @@ export default class IntegralMallView extends PaoYa.View {
         var _this = this
         this.listMall.vScrollBarSkin = '';
         this.listMall.selectEnable = true;
-        this.listMall.mouseHandler = new Laya.Handler(this, onSelect, [this.listMall]);
+        this.listMall.selectHandler = new Laya.Handler(this, onSelect, [this.listMall]);
         function onSelect(list, e, index) {
-            if (e.type == Laya.Event.CLICK) {
+            console.log(list,e,index)
                 if (index == 0) {
                     _this.control.changeMonet()
                 } else {
                     _this.control.skipExchangeGiftDialog()
                 }
-            }
+            
         }
     }
     reloadData(list) {

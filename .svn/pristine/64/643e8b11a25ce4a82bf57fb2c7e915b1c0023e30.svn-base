@@ -2298,7 +2298,6 @@ var Dialog = /** @class */ (function (_super) {
     __extends(Dialog, _super);
     function Dialog() {
         var _this = _super.call(this) || this;
-        _this.showBannerAdWhenDialogPopup = true;
         _this.createJSONView();
         return _this;
     }
@@ -2306,20 +2305,14 @@ var Dialog = /** @class */ (function (_super) {
         var json = this.constructor['JSONView'];
         json && this.createView(json);
     };
-    Dialog.prototype._onAdded = function () {
-        _super.prototype._onAdded.call(this);
-        this._showBannerAd();
-    };
-    Dialog.prototype._onRemoved = function () {
-        _super.prototype._onRemoved.call(this);
-        this._hideBannerAd();
-    };
-    Dialog.prototype._showBannerAd = function () {
-        if (this.showBannerAdWhenDialogPopup && _export__WEBPACK_IMPORTED_MODULE_0__["DataCenter"].showBannerAdWhenDialogPopup) {
+    Dialog.prototype.popup = function (closeOther, showEffect) {
+        _super.prototype.popup.call(this, closeOther, showEffect);
+        if (_export__WEBPACK_IMPORTED_MODULE_0__["DataCenter"].showBannerAdWhenDialogPopup) {
             this['bannerAd'] = _wx_ad_bannerAd__WEBPACK_IMPORTED_MODULE_1__["default"].show({});
         }
     };
-    Dialog.prototype._hideBannerAd = function () {
+    Dialog.prototype.close = function (type) {
+        _super.prototype.close.call(this, type);
         if (this['bannerAd']) {
             var bannerAd = this['bannerAd'];
             _wx_ad_bannerAd__WEBPACK_IMPORTED_MODULE_1__["default"].hide(bannerAd);

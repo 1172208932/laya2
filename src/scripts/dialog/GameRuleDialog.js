@@ -1,4 +1,4 @@
-export default class GameRuleDialog extends Laya.Dialog {
+export default class GameRuleDialog extends PaoYa.Dialog {
     onOpened() {
         if (!PaoYa.DataCenter.ruleUrl) { console.warn('请指定规则资源地址') }
         var url = PaoYa.DataCenter.ruleUrl;

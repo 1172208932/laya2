@@ -15,9 +15,13 @@ export default class IFHostControl extends PaoYa.Component {
         let view = this.owner
         view.graphics.drawRect(0, 0, view.width, view.height, "#8585e9")
     }
-    onDisappear(){
-        this.alert&&this.alert.close();
-        this.alert=null;
+    onAppear() {
+        // sdk update
+        this.createRoom()
+    }
+    onDisappear() {
+        this.alert && this.alert.close();
+        this.alert = null;
     }
     onClick(e) {
         switch (e.target.name) {
@@ -25,11 +29,7 @@ export default class IFHostControl extends PaoYa.Component {
                 this.sendMessage(PaoYa.Client.SHARE_START_GAME, { type: 1 })
                 break
             case 'btnInvite':
-                if (this.rname) {
-                    this.inviteFriend()
-                } else {
-                    this.sendMessage(PaoYa.Client.SHARE_INVITE_FRIEND, { type: 1 })
-                }
+                this.createRoom()
                 break
             case 'btnBack':
                 let _this = this
@@ -44,12 +44,19 @@ export default class IFHostControl extends PaoYa.Component {
                     }
                 })
                 alert.popup()
-                this.alert=alert;
+                this.alert = alert;
                 // PaoYa.Toast.showModal("提示", "确定退出房间?", "确定", () => {
                 //     this.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
                 //     this.navigator.pop()
                 // }, "取消")
                 break
+        }
+    }
+    createRoom() {
+        if (this.rname) {
+            this.inviteFriend()
+        } else {
+            this.sendMessage(PaoYa.Client.SHARE_INVITE_FRIEND, { type: 1 })
         }
     }
     inviteFriend() {
@@ -77,7 +84,7 @@ export default class IFHostControl extends PaoYa.Component {
             case PaoYa.Client.GAME_START_GAME:
                 let value = this.peopleJoinRoomData
                 value.room_name = this.rname,
-                value.match_list = [value.invite_user, value.receive_user]
+                    value.match_list = [value.invite_user, value.receive_user]
                 let data = {
                     type: PaoYa.GameEntryType.Friend,
                     matchData: value,
@@ -146,8 +153,8 @@ export default class IFHostControl extends PaoYa.Component {
             city: me.location
         })
     }
-    onDestroy(){
-        this.alert&&this.alert.close();
-        this.alert=null;
+    onDestroy() {
+        this.alert && this.alert.close();
+        this.alert = null;
     }
 }

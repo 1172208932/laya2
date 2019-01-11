@@ -1,4 +1,4 @@
-export default class AlertDialog extends Laya.Dialog {
+export default class AlertDialog extends PaoYa.Dialog {
     constructor(params){
         super()
         params.confirmText = params.confirmText || '知道了'

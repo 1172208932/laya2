@@ -1,5 +1,5 @@
 import AlertDialog from "./AlertDialog";
-export default class ChargeDialog extends Laya.Dialog {
+export default class ChargeDialog extends PaoYa.Dialog {
     onEnable() {
         this.init()
     }
