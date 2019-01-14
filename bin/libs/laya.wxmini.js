@@ -753,8 +753,10 @@ var MiniImage=(function(){
 					MiniFileMgr.downOtherFiles(url,new Handler(MiniImage,MiniImage.onDownImgCallBack,[url,thisLoader]),url);
 				}
 			}
-			else
-			MiniImage.onCreateImage(url,thisLoader,true);
+			else{
+				url=URL.formatURL(url)
+				MiniImage.onCreateImage(url,thisLoader,true);
+			}
 			}else {
 			MiniImage.onCreateImage(url,thisLoader,!isTransformUrl);
 		}
@@ -1093,9 +1095,10 @@ var MiniLoader=(function(_super){
 					MiniFileMgr.read(url,encoding,new Handler(MiniLoader,MiniLoader.onReadNativeCallBack,[encoding,url,type,cache,group,ignoreCache,thisLoader]));
 					return;
 				}
+				var _url = url
 				url=URL.formatURL(url);
 				if (url.indexOf("http://")!=-1 || url.indexOf("https://")!=-1 && !MiniAdpter.AutoCacheDownFile){
-					MiniAdpter.EnvConfig.load.call(thisLoader,url,type,cache,group,ignoreCache);
+					MiniAdpter.EnvConfig.load.call(thisLoader,_url,type,cache,group,ignoreCache);
 					}else {
 					MiniFileMgr.readFile(url,encoding,new Handler(MiniLoader,MiniLoader.onReadNativeCallBack,[encoding,url,type,cache,group,ignoreCache,thisLoader]),url);
 				}

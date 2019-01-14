@@ -5,6 +5,10 @@ import ThanksDialog from "../dialog/ThanksDialog";
 
 export default class MatchServiceForRemode {
     static loadMatchNum(type, cb) {
+        if (PaoYa.DataCenter.loginData.is_review) {
+            cb && cb(type)
+            return
+        }
         PaoYa.Request.GET('get_match_type_count', {}, res => {
             let playNum = res.total + '';
             let gameReward = PaoYa.DataCenter.loginData.config_list.game.jsonconfig.game_reward

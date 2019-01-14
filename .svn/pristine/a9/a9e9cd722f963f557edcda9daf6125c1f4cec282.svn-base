@@ -1,0 +1,125 @@
+import AlertDialog from "../../dialog/AlertDialog";
+
+const RouletteViewSign = 'rouletteViewSign'
+export default class RouletteViewControl extends PaoYa.Component {
+    /** @prop {name:containerView,tips:'',type:Node} */
+    /** @prop {name:imgLucky,tips:'',type:Node} */
+    /** @prop {name:rouletteItemView,tips:'',type:Prefab} */
+
+    onAwake() {
+        this.addViews()
+        this.reloadData(PaoYa.DataCenter.rouletteData.wheel_list)
+        let p = {
+            style: {
+                x: 0,
+                y: 200
+            }
+        }
+        this.showBannerAd(p)
+    }
+
+    addViews() {
+        this.containerView.removeChildren()
+        for (let i = 0; i < 8; i++) {
+            let view = Laya.Pool.getItemByCreateFun(RouletteViewSign, this.rouletteItemView.create, this.rouletteItemView)
+            view.pos(319, 319)
+            view.size(114, 298)
+            view.rotation = 45 * i
+            this.containerView.addChild(view)
+        }
+    }
+    requestData() {
+        this.GET('game_wheel_list', (res) => {
+            this.reloadData(res.wheel_list)
+        })
+    }
+    reloadData(list) {
+        let count = this.containerView.numChildren
+        for (let i = list.length - 1; i >= 0; i--) {
+            if (i < count) {
+                let view = this.containerView.getChildAt(count - 1 - i), item = list[i]
+                view.getChildByName('lblValue').text = `${item.num}`
+                view.getChildByName('imgIcon').getChildAt(0).skin = `remote/roulette/icon_bean${i + 1}.png`
+            }
+        }
+    }
+    onClick(e) {
+        switch (e.target.name) {
+            case 'start':
+                // this.prepareForRoulette(() => {
+                this.startRoulette()
+                // })
+                break
+        }
+    }
+    /**开始轮盘的准备阶段，此过程包含两个步骤
+     * 1、优先展示视频广告
+     * 2、没有视频广告时弹窗告知用户进行分享
+     * 3、只有完成上述任意一种行为，completion才会执行
+     */
+    prepareForRoulette(completion) {
+        let _this = this
+        let showAlert = function () {
+            let alert = new AlertDialog({
+                title: '提示',
+                message: '广告观看已达上限，请分享之后继续',
+                confirmText: '分享',
+                confirmHandler() {
+                    _this.shareDefault(() => {
+                        completion()
+                    })
+                },
+                cancelText: '取消'
+            })
+            alert.popup()
+        }
+        let p = {
+            onError() {
+                showAlert()
+            },
+            onClose(res) {
+                if (res.isEnded) {
+                    completion()
+                } else {
+                    let alert = new AlertDialog({ title: '提示', message: '看完广告才能继续哦' })
+                    alert.popup()
+                }
+            }
+        }
+        this.showRewardedVideoAd(p)
+    }
+    /**开始转动轮盘，主要是与服务器的交互 */
+    startRoulette() {
+        let index = Math.ceil(Math.random() * 8)
+        Laya.Tween.to(this.imgLucky, {
+            rotation: 360 - 45 * index + 360 * 4
+        }, 5000, Laya.Ease.circOut, Laya.Handler.create(this, function () { }));
+    }
+}
+
+/**显示转盘界面 */
+RouletteViewControl.show = function () {
+    PaoYa.Navigator.scenesMap = {
+        RouletteView: 'scenes/RouletteView'
+    }
+    PaoYa.Request.GET('game_wheel_list', {}, (res) => {
+        PaoYa.DataCenter.rouletteData = res
+        PaoYa.navigator.present('RouletteView')
+    })
+}
+/**
+ * 显示转盘的悬浮按钮
+ * @param location 表示转盘的位置信息，其值为：
+ * {
+ *  x:100,
+ *  y:100
+ * }
+ */
+RouletteViewControl.showAnimateIcon = function (location) {
+
+}
+/**
+ * 集成指南
+ * 1、如果需要显示转盘界面，则使用 RouletteViewControl.show()
+ * 2、如果需要显示悬浮按钮，则使用 RouletteViewControl.showAnimateIcon()
+ */

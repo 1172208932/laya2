@@ -4130,7 +4130,7 @@ var WebGLContext=(function(){
 		if (!WebGL._isWebGL2){
 			VertexArrayObject;
 			if (window._setupVertexArrayObject){
-				if (Browser.onMiniGame||Browser.onLimixiu)
+				if (Browser.onMiniGame)
 					window._forceSetupVertexArrayObject(gl);
 				else
 				window._setupVertexArrayObject(gl);
@@ -13450,11 +13450,6 @@ var CharRender_Canvas=(function(_super){
 			CharRender_Canvas.ctx.font=CharBook._curFont;
 			CharRender_Canvas.ctx._lastFont=CharBook._curFont;
 		}
-		var rst=CharRender_Canvas.ctx.measureText(str);
-		if(!rst)
-		{
-			return 1;
-		}
 		return CharRender_Canvas.ctx.measureText(str).width;
 	}
 
@@ -13541,15 +13536,8 @@ var CharRender_Canvas=(function(_super){
 			CharRender_Canvas.ctx.strokeStyle=strokeColStr;
 			CharRender_Canvas.ctx.fillStyle=colStr;
 			CharRender_Canvas.ctx.lineWidth=lineWidth;
-				if(CharRender_Canvas.ctx.fillAndStrokeText)
-				{
-					CharRender_Canvas.ctx.fillAndStrokeText(char,0,0);
-					//CharRender_Canvas.ctx.fillText(char,0,0);
-				}else
-				{
-					CharRender_Canvas.ctx.strokeText(char,0,0);
-					CharRender_Canvas.ctx.fillText(char,0,0);
-				}
+			CharRender_Canvas.ctx.strokeText(char,0,0);
+			CharRender_Canvas.ctx.fillText(char,0,0);
 			}else {
 			CharRender_Canvas.ctx.fillStyle=colStr;
 			CharRender_Canvas.ctx.fillText(char,0,0);

@@ -3,15 +3,38 @@ import MatchGradeService from "../common/MatchGradeService/MatchGradeService";
 
 export default class CrossLinkControl extends PaoYa.Component {
     onAwake() {
-        if (this.owner.params) { this.gameType = this.owner.params.type; }
-        this.GET('game_whole_list', (res) => {
-            let promise = new Promise((resolve, reject) => {
-                Utils.loadOtherGameList(8, resolve)
-            });
-            promise.then((data) => {
-                this.spineInfo = data
-                this.setData(res)
-            });
+        if (typeof (this.owner.params) != 'string') {
+            this.gameType = this.owner.params.type;
+            this.point = ''
+        } else {
+            this.point = this.owner.params
+        }
+        this.loadGameData((res) => {
+            this.requestGames((list) => {
+                this.setData(list)
+            })
+        })
+        this.postPoint()
+    }
+    postPoint(){
+        //统计曝光次数
+        this.POST(`point_log_record`, { point_name: "exposure", point_type: `crossLink${this.point}` }, (res) => {
+        })
+    }
+    requestGames(cb) {
+        if (PaoYa.DataCenter.allGames) {
+            cb(PaoYa.DataCenter.allGames)
+        } else {
+            this.GET('game_whole_list', (res) => {
+                PaoYa.DataCenter.allGames = res
+                cb(res)
+            })
+        }
+    }
+    loadGameData(cb) {
+        Utils.loadOtherGameList(8, data => {
+            this.spineInfo = data
+            cb()
         })
     }
     onThrottleClick(e) {
@@ -31,7 +54,7 @@ export default class CrossLinkControl extends PaoYa.Component {
         this.owner.setListData(list)
     }
     gameClick(data, index) {
-        this.POST('point_log_record', { point_name: `play00${index + 1}`, point_extra: data.id, point_type: 'crossLink' }, (res) => {
+        this.POST(`point_log_record`, { point_name: `play00${index + 1}`, point_extra: data.id, point_type: `crossLink${this.point}` }, (res) => {
         })
         Utils.navigateToMiniProgram({
             appId: data.appId,

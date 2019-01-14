@@ -19,6 +19,9 @@ export default class Task extends PaoYa.Component {
             this.requestData()
         });
     }
+    onDisappear(){
+        Laya.Dialog.manager.closeAll()
+    }
     requestData() {
         this.GET("get_share_task", {}, (data) => {
             this.data = data;
@@ -75,6 +78,7 @@ export default class Task extends PaoYa.Component {
                     dialog.btnOk.clickHandler = Laya.Handler.create(this, () => {
                         dialog.close();
                     });
+                    
                 }))
                 break;
             case TaskViewStatus.receive:

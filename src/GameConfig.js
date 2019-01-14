@@ -39,18 +39,22 @@ import ExchangeMoneyDialog from "./scripts/dialog/ExchangeMoneyDialog"
 import CustomerService from "./scripts/prefab/CustomerService"
 import MoneyBalance from "./scripts/prefab/MoneyBalance"
 import DoubleDialog from "./scripts/dialog/DoubleDialog"
+import ExchangeGiftDialog from "./scripts/dialog/ExchangeGiftDialog"
 import GameAgainDialog from "./scripts/dialog/GameAgainDialog"
 import GameRuleDialog from "./scripts/dialog/GameRuleDialog"
 import LoginReward from "./scripts/dialog/LoginReward"
 import LoginRewardControl from "./scripts/dialog/LoginRewardControl"
+import MoreGameDialog from "./scripts/dialog/MoreGameDialog"
 import MiniGameSpine from "./scripts/prefab/MiniGameSpine"
 import NotEnoughDialog from "./scripts/dialog/NotEnoughDialog"
 import NoVideoDialog from "./scripts/dialog/NoVideoDialog"
+import RouletteRewardDialog from "./scripts/common/View/RouletteRewardDialog"
 import SettingDialog from "./scripts/dialog/SettingDialog"
 import TaskReward from "./scripts/dialog/TaskReward"
 import MoreGameButton from "./scripts/prefab/MoreGameButton"
-import WxIcon from "./scripts/prefab/WxIcon"
 import HomeControl from "./scripts/common/HomeControl"
+import RouletteView from "./scripts/common/View/RouletteView"
+import WxIcon from "./scripts/prefab/WxIcon"
 
 export default class GameConfig {
     static init() {
@@ -96,18 +100,22 @@ export default class GameConfig {
 		reg("scripts/prefab/CustomerService.js",CustomerService);
 		reg("scripts/prefab/MoneyBalance.js",MoneyBalance);
 		reg("scripts/dialog/DoubleDialog.js",DoubleDialog);
+		reg("scripts/dialog/ExchangeGiftDialog.js",ExchangeGiftDialog);
 		reg("scripts/dialog/GameAgainDialog.js",GameAgainDialog);
 		reg("scripts/dialog/GameRuleDialog.js",GameRuleDialog);
 		reg("scripts/dialog/LoginReward.js",LoginReward);
 		reg("scripts/dialog/LoginRewardControl.js",LoginRewardControl);
+		reg("scripts/dialog/MoreGameDialog.js",MoreGameDialog);
 		reg("scripts/prefab/MiniGameSpine.js",MiniGameSpine);
 		reg("scripts/dialog/NotEnoughDialog.js",NotEnoughDialog);
 		reg("scripts/dialog/NoVideoDialog.js",NoVideoDialog);
+		reg("scripts/common/View/RouletteRewardDialog.js",RouletteRewardDialog);
 		reg("scripts/dialog/SettingDialog.js",SettingDialog);
 		reg("scripts/dialog/TaskReward.js",TaskReward);
 		reg("scripts/prefab/MoreGameButton.js",MoreGameButton);
-		reg("scripts/prefab/WxIcon.js",WxIcon);
 		reg("scripts/common/HomeControl.js",HomeControl);
+		reg("scripts/common/View/RouletteView.js",RouletteView);
+		reg("scripts/prefab/WxIcon.js",WxIcon);
     }
 }
 GameConfig.width = 640;
@@ -116,7 +124,7 @@ GameConfig.scaleMode ="fixedwidth";
 GameConfig.screenMode = "none";
 GameConfig.alignV = "top";
 GameConfig.alignH = "left";
-GameConfig.startScene = "scenes/HomeView.scene";
+GameConfig.startScene = "scenes/common/GameResult/GameResultView.scene";
 GameConfig.sceneRoot = "";
 GameConfig.debug = false;
 GameConfig.stat = false;

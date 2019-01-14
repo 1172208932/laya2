@@ -58,8 +58,8 @@ export default class GameResultControl extends PaoYa.Component {
             if (this.gameType == PaoYa.GameEntryType.Friend) {
                 this.navigator.popToRootScene();
             } else {
-                this.navigator.popToScene("MatchGradeView");
-                this.navigator.popup('CrossLinkDialog')
+                this.navigator.popToScene('MatchGradeView')
+                this.navigator.popup('CrossLinkDialog','005')
             }
         }
     }
@@ -72,12 +72,11 @@ export default class GameResultControl extends PaoYa.Component {
             if (PaoYa.DataCenter.isFromMiniProgram) {
                 PaoYa.game.exit();
             } else {
-                this.navigator.popup('CrossLinkDialog')
+                this.navigator.popup('CrossLinkDialog','004')
             }
             return;
         }
         if (this.owner.btnShare.label == "炫耀一下") {
-            this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
             if (PaoYa.DataCenter.isFromMiniProgram) {
                 PaoYa.game.exit();
             } else {
@@ -85,6 +84,7 @@ export default class GameResultControl extends PaoYa.Component {
             }
             return;
         }
+        this.navigator.popToRootScene()
         this.navigator.push('IFHostView')
     }
     sendShareAward() {
