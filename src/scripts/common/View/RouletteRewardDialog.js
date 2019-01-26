@@ -40,10 +40,10 @@ export default class RouletteRewardDialog extends Laya.Dialog {
         PaoYa.Request.POST('game_wheel_receive',{wheel_id:id,is_double:isDouble?1:0},res=>{
             PaoYa.DataCenter.refreshUserInfo()
             this.close('')
-        },()=>{
+        },(msg)=>{
             let alert = new AlertDialog({
                 title:'提示',
-                message:'请求失败'
+                message:msg
             })
             alert.popup()
         })

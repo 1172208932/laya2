@@ -11,31 +11,19 @@ export default class MatchControl extends PaoYa.Component {
         this.sendMessage(PaoYa.Client.LEAVE_ROOM, { match_type_id: this.params.id });
         this.startMatch();
         this.init()
-        if (!window.wx) return
-        var screenHeight = wx.getSystemInfoSync().screenHeight;
-        var screenWidth = wx.getSystemInfoSync().screenWidth;
-        var WIDTH = screenWidth * 0.8;
-        var HEIGHT = Math.ceil(screenWidth * 0.8 * 0.33);
-        var viewHeight = (screenWidth * Laya.stage.designHeight) / Laya.stage.designWidth;
-        var viewY = (screenHeight - viewHeight) / 2;
-        let bannerParams = {
-            adUnitId: 'adunit-3ba53115d9b84cc1',
-            style: {
-                top: screenHeight - 200,
-                left: 0,
-                width: WIDTH,
-                height: HEIGHT
-            }
-        }
-        this.showBannerAd(bannerParams)
     }
-    onClick(e) {
+    onThrottleClick(e) {
         let _this = this;
         switch (e.target.name) {
             case 'back':/**/
                 this.backHandler();
                 break;
         }
+    }
+    onHide() {
+        this.socket.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
+        Laya.Dialog.manager.closeAll()
+        this.navigator.popToRootScene()
     }
     init() {
         this.matchOk = false;
@@ -75,11 +63,28 @@ export default class MatchControl extends PaoYa.Component {
                 }
                 GameService.startGame(data);
                 break;
-                case PaoYa.Client.GAME_END_PK:
-                Service.stopGame(value);
-                break;
         }
 
+    }
+    onReceiveSocketError(cmd, code) {
+        if (cmd == PaoYa.Client.MATCH_JOIN) {
+            if (code == 2012) {
+                this.noEnoughMoneyTip();
+            }
+        }
+
+    }
+    noEnoughMoneyTip() {
+        let _this=this;
+        let alert = new AlertDialog({
+            title: '提示',
+            message: "啊哦~您的豆子不足啦~",
+            confirmText: "知道了",
+            confirmHandler: function () {
+                _this.navigator.pop()
+            }
+        })
+        alert.popup();
     }
     changeMatchTypeId(id) {
         this.params.id = id;
@@ -169,6 +174,8 @@ export default class MatchControl extends PaoYa.Component {
         let _this = this;
         this.isCancel = false;
         this.stopMatch();
+        Laya.Dialog.manager = null;
+        Laya.UIConfig.closeDialogOnSide = false;
         if (this.matchOk) {
             let alert = new AlertDialog({
                 title: '提示',
@@ -183,6 +190,7 @@ export default class MatchControl extends PaoYa.Component {
                 }
             })
             alert.popup();
+            this.alert = alert;
         } else {
             let alert = new AlertDialog({
                 title: '提示',
@@ -202,7 +210,12 @@ export default class MatchControl extends PaoYa.Component {
                 }
             })
             alert.popup();
+            this.alert = alert;
         }
+        this.alert.closeHandler = Laya.Handler.create(this, () => {
+            Laya.Dialog.manager = null;
+            Laya.UIConfig.closeDialogOnSide = true;
+        }, null, false)
     }
     onDestroy() {
         this.stopMatch();

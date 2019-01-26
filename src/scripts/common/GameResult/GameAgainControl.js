@@ -2,11 +2,8 @@ import GameService from '../../utils/GameService';
 import AlertDialog from '../../dialog/AlertDialog';
 import GameAgainDialog from '../../dialog/GameAgainDialog';
 export default class GameAgainControl extends PaoYa.Component {
-    onEnable() {
-        this.dealData();
-    }
-    dealData() {
-        let data = this.owner.params.result;
+    dealData(res) {
+        let data = res.result;
         let userId = PaoYa.DataCenter.user.id;
         let otherInfo = {};
         if (userId == data.lose_user.user_id) {
@@ -16,6 +13,7 @@ export default class GameAgainControl extends PaoYa.Component {
         }
         this.userId = otherInfo.user_id;
         this.name = PaoYa.Utils.formatName(otherInfo.user_name);
+        this.enabled = true
     }
     onReceiveMessage(cmd, value) {
         switch (cmd) {
@@ -27,9 +25,6 @@ export default class GameAgainControl extends PaoYa.Component {
                 break;
             case PaoYa.Client.AGAIN_CANCAL:
                 this.cancelHandler();
-                break;
-            case PaoYa.Client.GAME_START_GAME:
-                this.startGameHandler(value);
                 break;
         }
     }
@@ -43,8 +38,6 @@ export default class GameAgainControl extends PaoYa.Component {
         this.lastTime = now
         let _this = this;
         if (isSender === void 0) { isSender = true; }
-        Laya.Dialog.manager = null
-        Laya.UIConfig.closeDialogOnSide = false;
         if (!this.view) {
             let view = new GameAgainDialog()
             view.closeHandler = Laya.Handler.create(this, (type) => {

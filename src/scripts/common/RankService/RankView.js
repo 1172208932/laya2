@@ -3,6 +3,8 @@ export default class RankView extends PaoYa.View {
         this.configListView()
         if (PaoYa.game.params.rankingType == PaoYa.RankingType.WIN){
             this.btnLeft.label = '胜\n局\n榜'
+        }else{
+            this.btnLeft.label = '高\n分\n榜'
         }
     }
     configListView(){

@@ -16,7 +16,7 @@ export default class CrossLinkControl extends PaoYa.Component {
         })
         this.postPoint()
     }
-    postPoint(){
+    postPoint() {
         //统计曝光次数
         this.POST(`point_log_record`, { point_name: "exposure", point_type: `crossLink${this.point}` }, (res) => {
         })
@@ -47,11 +47,25 @@ export default class CrossLinkControl extends PaoYa.Component {
         res.forEach(element => {
             for (let i = 0; i < 8; i++) {
                 if (element.appId == this.spineInfo[i]) {
-                    list.push({ name: element.name, icon: `https://res.xingqiu123.com/img/xcx/gameHall_2.0/home/game_icon_${element.id}.png`, id: element.id, appId: element.appId, image: element.qr_img })
+                    list.push({ name: element.name, icon: `https://res.xingqiu123.com/img/xcx/gameHall_2.0/home/game_icon_${element.id}.png?imageView2/0/w/100`, id: element.id, appId: element.appId, image: element.qr_img })
                 }
             }
         });
+        this.shuffle(list)
         this.owner.setListData(list)
+
+    }
+    shuffle(arr) {
+        var length = arr.length,
+            randomIndex,
+            temp;
+        while (length) {
+            randomIndex = Math.floor(Math.random() * (length--));
+            temp = arr[randomIndex];
+            arr[randomIndex] = arr[length];
+            arr[length] = temp
+        }
+        return arr;
     }
     gameClick(data, index) {
         this.POST(`point_log_record`, { point_name: `play00${index + 1}`, point_extra: data.id, point_type: `crossLink${this.point}` }, (res) => {

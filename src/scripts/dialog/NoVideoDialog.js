@@ -5,9 +5,5 @@ export default class NoVideoDialog extends PaoYa.Dialog{
             this.close()
             PaoYa.navigator.popup('CrossLinkDialog')
         })
-        this.toFriend.on(Laya.Event.CLICK,this,()=>{
-            this.close()
-            PaoYa.navigator.push('IFHostView')
-        })
     }
 }

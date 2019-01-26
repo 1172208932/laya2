@@ -447,7 +447,7 @@ var MiniImage$1=(function(){
 				thisLoader._url=URL.formatURL(thisLoader._url);
 				image=HTMLImage.create(imageSource.width,imageSource.height);
 				image.loadImageSource(imageSource,true);
-				image._setUrl(fileNativeUrl);
+				image._setCreateURL(fileNativeUrl);
 				clear();
 				thisLoader.onLoaded(image);
 			};
@@ -515,6 +515,12 @@ var MiniInput$1=(function(){
 		}});
 		BMiniAdapter.window.swan.onKeyboardConfirm(function(res){
 			var str=res ? res.value :"";
+			if (_inputTarget._restrictPattern){
+				str=str.replace(/\u2006|\x27/g,"");
+				if (_inputTarget._restrictPattern.test(str)){
+					str=str.replace(_inputTarget._restrictPattern,"");
+				}
+			}
 			_inputTarget.text=str;
 			_inputTarget.event(/*laya.events.Event.INPUT*/"input");
 			laya.bd.mini.MiniInput.inputEnter();
@@ -525,6 +531,12 @@ var MiniInput$1=(function(){
 				if (str.indexOf("\n")!=-1){
 					laya.bd.mini.MiniInput.inputEnter();
 					return;
+				}
+			}
+			if (_inputTarget._restrictPattern){
+				str=str.replace(/\u2006|\x27/g,"");
+				if (_inputTarget._restrictPattern.test(str)){
+					str=str.replace(_inputTarget._restrictPattern,"");
 				}
 			}
 			_inputTarget.text=str;
@@ -990,9 +1002,10 @@ var MiniLoader$1=(function(_super){
 		(ignoreCache===void 0)&& (ignoreCache=false);
 		var thisLoader=this;
 		thisLoader._url=url;
+		url=URL.customFormat(url);
 		if (url.indexOf("data:image")===0)thisLoader._type=type=/*laya.net.Loader.IMAGE*/"image";
 		else {
-			thisLoader._type=type || (type=Loader.getTypeFromUrl(url));
+			thisLoader._type=type || (type=Loader.getTypeFromUrl(thisLoader._url));
 		}
 		thisLoader._cache=cache;
 		thisLoader._data=null;
@@ -1036,6 +1049,13 @@ var MiniLoader$1=(function(_super){
 							var newfileHead=BMiniAdapter.subMaps[curfileHead];
 							url=url.replace(curfileHead,newfileHead);
 						}
+					};
+					var tempStr=URL.rootPath !="" ? URL.rootPath :URL.basePath;
+					var tempUrl=url;
+					if (tempStr !="")
+						url=url.split(tempStr)[1];
+					if (!url){
+						url=tempUrl;
 					}
 					MiniFileMgr$1.read(url,encoding,new Handler(MiniLoader,MiniLoader.onReadNativeCallBack,[encoding,url,type,cache,group,ignoreCache,thisLoader]));
 					return;
@@ -1217,7 +1237,9 @@ var MiniSound$1=(function(_super){
 			tSound.src=this.url=MiniFileMgr$1.getFileNativePath(fileMd5Name);
 			}else{
 			tSound.src=this.url;
-		};
+		}
+		if(!tSound)
+			return null;
 		var channel=new MiniSoundChannel$1(tSound,this);
 		channel.url=this.url;
 		channel.loops=loops;
@@ -1293,6 +1315,7 @@ var MiniSoundChannel$1=(function(_super){
 	var __proto=MiniSoundChannel.prototype;
 	/**@private **/
 	__proto.__onEnd=function(){
+		MiniSound$1._audioCache[this.url]=this._miniSound;
 		if (this.loops==1){
 			if (this.completeHandler){
 				Laya.systemTimer.once(10,this,this.__runComplete,[this.completeHandler],false);
@@ -1332,6 +1355,7 @@ var MiniSoundChannel$1=(function(_super){
 			return;
 		this._audio.pause();
 		this._audio.offEnded(null);
+		this._miniSound.dispose();
 		this._audio=null;
 		this._miniSound=null;
 		this._onEnd=null;

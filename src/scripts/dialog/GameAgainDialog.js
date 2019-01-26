@@ -29,6 +29,9 @@ export default class GameAgainDialog extends PaoYa.Dialog{
 
         }
         this.callLater(this.reloadView)
+        Laya.Dialog.manager.closeAll();
+        Laya.Dialog.manager = null
+        Laya.UIConfig.closeDialogOnSide = false;
         this.popup(true,false)
         this.startTimer()
     }

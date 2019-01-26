@@ -1,6 +1,5 @@
 import Utils from "../../utils/utils";
 import MatchGradeService from "../MatchGradeService/MatchGradeService";
-import GameAgainControl from "./GameAgainControl";
 import AlertDialog from "../../dialog/AlertDialog";
 export default class GameResultControl extends PaoYa.Component {
     constructor() { super(); }
@@ -15,9 +14,6 @@ export default class GameResultControl extends PaoYa.Component {
             this.myInfo = this.params.lose_user;
         } else {
             this.myInfo = this.params.win_user;
-        }
-        if (this.gameType == PaoYa.GameEntryType.Friend) {
-            this.owner.getComponent(GameAgainControl).enabled = true;
         }
         this.onNotification("double", this, () => {
             this.sendShareAward()
@@ -40,7 +36,7 @@ export default class GameResultControl extends PaoYa.Component {
         switch (cmd) {
             //积分 
             case "shareaward":
-                PaoYa.Toast.show('恭喜获得' + value.integral + '积分，积分可以兑换奖品哦！', 3000);
+                PaoYa.Toast.show('获得' + value.integral + '积分', 3000);
                 break;
             case PaoYa.Client.DISCONNECT:
                 if (this.gameType == PaoYa.GameEntryType.Friend) {
@@ -50,6 +46,7 @@ export default class GameResultControl extends PaoYa.Component {
         }
     }
     backHandler() {
+        PaoYa.DataCenter.showBeanPercent = 0
         this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
         if (PaoYa.DataCenter.isFromMiniProgram) {
             PaoYa.game.exit();
@@ -64,6 +61,7 @@ export default class GameResultControl extends PaoYa.Component {
         }
     }
     shareHandler() {
+        PaoYa.DataCenter.showBeanPercent = 0
         var _this = this;
         let content = PaoYa.DataCenter.config.game.share_list.randomItem;
         if (this.owner.btnShare.label == "换换手气") {
@@ -85,21 +83,19 @@ export default class GameResultControl extends PaoYa.Component {
             return;
         }
         this.navigator.popToRootScene()
-        this.navigator.push('IFHostView')
+        this.navigator.push('FBView')
     }
     sendShareAward() {
         this.sendMessage('shareaward', {});
     }
     againHandler() {
+        Utils.recordPoint('button011', 'click')
         PaoYa.DataCenter.showBeanPercent = 0
         this.GET("update_chips", function (data) {
             PaoYa.DataCenter.user.gold = data.pao_gold;
             if (this.gameType == PaoYa.GameEntryType.Match) {//重新走匹配
                 let type = MatchGradeService.type;
                 MatchGradeService.checkIfMatch(type);
-            } else if (this.gameType == PaoYa.GameEntryType.Friend) {
-                //邀请对方再来一局
-                this.owner.getComponent(GameAgainControl).showGameAgain();
             }
         })
     }

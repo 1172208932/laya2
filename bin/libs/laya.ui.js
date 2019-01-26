@@ -4,14 +4,15 @@
 
 	var Animation=laya.display.Animation,Browser=laya.utils.Browser,ClassUtils=laya.utils.ClassUtils,ColorFilter=laya.filters.ColorFilter;
 	var Component=laya.components.Component,Const=laya.Const,Ease=laya.utils.Ease,Event=laya.events.Event,Graphics=laya.display.Graphics;
-	var Handler=laya.utils.Handler,Input=laya.display.Input,Loader=laya.net.Loader,Matrix=laya.maths.Matrix,Node=laya.display.Node;
-	var Point=laya.maths.Point,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,Scene=laya.display.Scene;
-	var SceneUtils=laya.utils.SceneUtils,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Text=laya.display.Text;
-	var Texture=laya.resource.Texture,Tween=laya.utils.Tween,Utils=laya.utils.Utils,WeakObject=laya.utils.WeakObject;
+	var Handler=laya.utils.Handler,Input=laya.display.Input,Loader=laya.net.Loader,LocalStorage=laya.net.LocalStorage;
+	var Matrix=laya.maths.Matrix,Node=laya.display.Node,Point=laya.maths.Point,Rectangle=laya.maths.Rectangle;
+	var Render=laya.renders.Render,Scene=laya.display.Scene,SceneUtils=laya.utils.SceneUtils,Sprite=laya.display.Sprite;
+	var Stage=laya.display.Stage,Text=laya.display.Text,Texture=laya.resource.Texture,Tween=laya.utils.Tween;
+	var Utils=laya.utils.Utils,WeakObject=laya.utils.WeakObject;
 Laya.interface('laya.ui.IBox');
 Laya.interface('laya.ui.IItem');
-Laya.interface('laya.ui.ISelect');
 Laya.interface('laya.ui.IRender');
+Laya.interface('laya.ui.ISelect');
 /**
 *<code>UIUtils</code> 是文本工具集。
 */
@@ -873,11 +874,11 @@ var DialogManager=(function(_super){
 		/**@private 全局默认弹出对话框效果，可以设置一个效果代替默认的弹出效果，如果不想有任何效果，可以赋值为null*/
 		this.popupEffect=function(dialog){
 			dialog.scale(1,1);
-			Tween.from(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.backOut,Handler.create(this,this.doOpen,[dialog]));
+			dialog._effectTween=Tween.from(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.backOut,Handler.create(this,this.doOpen,[dialog]),0,false,false);
 		}
 		/**@private 全局默认关闭对话框效果，可以设置一个效果代替默认的关闭效果，如果不想有任何效果，可以赋值为null*/
 		this.closeEffect=function(dialog){
-			Tween.to(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.strongOut,Handler.create(this,this.doClose,[dialog]));
+			dialog._effectTween=Tween.to(dialog,{x:Laya.stage.width / 2,y:Laya.stage.height / 2,scaleX:0,scaleY:0},300,Ease.strongOut,Handler.create(this,this.doClose,[dialog]),0,false,false);
 		}
 		DialogManager.__super.call(this);
 		this.maskLayer=new Sprite();
@@ -941,12 +942,21 @@ var DialogManager=(function(_super){
 		(closeOther===void 0)&& (closeOther=false);
 		(showEffect===void 0)&& (showEffect=false);
 		if (closeOther)this._closeAll();
+		this._clearDialogEffect(dialog);
 		if (dialog.isPopupCenter)this._centerDialog(dialog);
 		this.addChild(dialog);
 		if (dialog.isModal || this._getBit(/*laya.Const.HAS_ZORDER*/0x20))Laya.timer.callLater(this,this._checkMask);
 		if (showEffect && dialog.popupEffect !=null)dialog.popupEffect.runWith(dialog);
 		else this.doOpen(dialog);
 		this.event(/*laya.events.Event.OPEN*/"open");
+	}
+
+	/**@private */
+	__proto._clearDialogEffect=function(dialog){
+		if (dialog._effectTween){
+			Tween.clear(dialog._effectTween);
+			dialog._effectTween=null;
+		}
 	}
 
 	/**
@@ -972,6 +982,7 @@ var DialogManager=(function(_super){
 	*@param dialog 需要关闭的对象框 <code>Dialog</code> 实例。
 	*/
 	__proto.close=function(dialog){
+		this._clearDialogEffect(dialog);
 		if (dialog.isShowEffect && dialog.closeEffect !=null)dialog.closeEffect.runWith([dialog]);
 		else this.doClose(dialog);
 		this.event(/*laya.events.Event.CLOSE*/"close");
@@ -1246,7 +1257,7 @@ var View=(function(_super){
 var ScrollBar=(function(_super){
 	function ScrollBar(skin){
 		/**滚动衰减系数*/
-		this.rollRatio=0.95;
+		this.rollRatio=0.97;
 		/**滚动变化时回调，回传value参数。*/
 		this.changeHandler=null;
 		/**是否缩放滑动条，默认值为true。 */
@@ -1325,6 +1336,7 @@ var ScrollBar=(function(_super){
 	/**@inheritDoc */
 	__proto.initialize=function(){
 		this.slider.showLabel=false;
+		this.slider.tick=0;
 		this.slider.on(/*laya.events.Event.CHANGE*/"change",this,this.onSliderChange);
 		this.slider.setSlider(0,0,0);
 		this.upButton.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.onButtonMouseDown);
@@ -1450,6 +1462,7 @@ var ScrollBar=(function(_super){
 	/**@private */
 	__proto.onTargetMouseDown=function(e){
 		if ((this.isLockedFun)&& !this.isLockedFun(e))return;
+		this.event(/*laya.events.Event.END*/"end");
 		this._clickOnly=true;
 		this._lastOffset=0;
 		this._checkElastic=false;
@@ -1478,8 +1491,33 @@ var ScrollBar=(function(_super){
 	__proto.cancelDragOp=function(){
 		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",this,this.onStageMouseUp2);
 		Laya.stage.off(/*laya.events.Event.MOUSE_OUT*/"mouseout",this,this.onStageMouseUp2);
+		Laya.timer.clear(this,this.tweenMove);
 		Laya.timer.clear(this,this.loop);
 		this._target.mouseEnabled=true;
+	}
+
+	__proto.checkTriggers=function(isTweenMove){
+		(isTweenMove===void 0)&& (isTweenMove=false);
+		if (this.value >=0&&this.value-this._lastOffset<=0){
+			if ((this.triggerDownDragLimit)&& this.triggerDownDragLimit(isTweenMove)){
+				this.cancelDragOp();
+				this.value=0;
+				return true;
+			}
+		}
+		if (this.value <=this.max && (this.value-this._lastOffset >=this.max)){
+			if ((this.triggerUpDragLimit)&& this.triggerUpDragLimit(isTweenMove)){
+				this.cancelDragOp();
+				this.value=this.max;
+				return true;
+			}
+		}
+		return false;
+	}
+
+	__proto.startTweenMoveForce=function(lastOffset){
+		this._lastOffset=lastOffset;
+		Laya.timer.frameLoop(1,this,this.tweenMove,[200]);
 	}
 
 	/**@private */
@@ -1490,18 +1528,7 @@ var ScrollBar=(function(_super){
 		if (this._clickOnly){
 			if (Math.abs(this._lastOffset *(this.isVertical ? Laya.stage._canvasTransform.getScaleY():Laya.stage._canvasTransform.getScaleX()))> 1){
 				this._clickOnly=false;
-				if (this.value==0&&this._lastOffset>0){
-					if ((this.triggerDownDragLimit)&& this.triggerDownDragLimit()){
-						this.cancelDragOp();
-						return;
-					}
-				}
-				if (this.value==this.max && this._lastOffset < 0){
-					if ((this.triggerUpDragLimit)&& this.triggerUpDragLimit()){
-						this.cancelDragOp();
-						return;
-					}
-				}
+				if (this.checkTriggers())return;
 				this._offsets || (this._offsets=[]);
 				this._offsets.length=0;
 				this._target.mouseEnabled=false;
@@ -1511,6 +1538,8 @@ var ScrollBar=(function(_super){
 				}
 				this.event(/*laya.events.Event.START*/"start");
 			}else return;
+			}else{
+			if (this.checkTriggers())return;
 		}
 		this._offsets.push(this._lastOffset);
 		this._lastPoint.x=mouseX;
@@ -1532,9 +1561,21 @@ var ScrollBar=(function(_super){
 		}
 		if (this._isElastic){
 			if (this._value <=this.min){
-				this.value-=this._lastOffset *Math.max(0,(1-((this.min-this._value)/ this.elasticDistance)));
+				if (this._lastOffset > 0){
+					this.value-=this._lastOffset *Math.max(0,(1-((this.min-this._value)/ this.elasticDistance)));
+					}else{
+					this.value-=this._lastOffset *0.5;
+					if(this._value>=this.min)
+						this._checkElastic=false;
+				}
 				}else if (this._value >=this.max){
-				this.value-=this._lastOffset *Math.max(0,(1-((this._value-this.max)/ this.elasticDistance)));
+				if (this._lastOffset < 0){
+					this.value-=this._lastOffset *Math.max(0,(1-((this._value-this.max)/ this.elasticDistance)));
+					}else{
+					this.value-=this._lastOffset *0.5;
+					if(this._value<=this.max)
+						this._checkElastic=false;
+				}
 			}
 			}else {
 			this.value-=this._lastOffset;
@@ -1573,8 +1614,8 @@ var ScrollBar=(function(_super){
 				this.event(/*laya.events.Event.END*/"end");
 				return;
 			}
-			if (offset > 60)this._lastOffset=this._lastOffset > 0 ? 60 :-60;
-			var dis=Math.round(Math.abs(this.elasticDistance *(this._lastOffset / 240)));
+			if (offset > 250)this._lastOffset=this._lastOffset > 0 ? 250 :-250;
+			var dis=Math.round(Math.abs(this.elasticDistance *(this._lastOffset / 150)));
 			Laya.timer.frameLoop(1,this,this.tweenMove,[dis]);
 		}
 	}
@@ -1591,6 +1632,9 @@ var ScrollBar=(function(_super){
 	/**@private */
 	__proto.tweenMove=function(maxDistance){
 		this._lastOffset *=this.rollRatio;
+		if (this.checkTriggers(true)){
+			return;
+		};
 		var tarSpeed=NaN;
 		if (maxDistance > 0){
 			if (this._lastOffset > 0 && this.value <=this.min){
@@ -1604,7 +1648,7 @@ var ScrollBar=(function(_super){
 			}
 		}
 		this.value-=this._lastOffset;
-		if (Math.abs(this._lastOffset)< 1){
+		if (Math.abs(this._lastOffset)< 0.1){
 			Laya.timer.clear(this,this.tweenMove);
 			if (this._isElastic){
 				if (this._value < this.min){
@@ -1659,6 +1703,7 @@ var ScrollBar=(function(_super){
 	__getset(0,__proto,'skin',function(){
 		return this._skin;
 		},function(value){
+		if (value==" ")return;
 		if (this._skin !=value){
 			this._skin=value;
 			if (this._skin&&!Loader.getRes(this._skin)){
@@ -1784,6 +1829,10 @@ var ScrollBar=(function(_super){
 		},function(value){
 		this._mouseWheelEnable=value;
 		this.target=this._target;
+	});
+
+	__getset(0,__proto,'lastOffset',function(){
+		return this._lastOffset;
 	});
 
 	/**
@@ -2197,8 +2246,10 @@ var Slider=(function(_super){
 		}
 		this._tx=Laya.stage.mouseX;
 		this._ty=Laya.stage.mouseY;
-		var pow=Math.pow(10,(this._tick+"").length-1);
-		this._value=Math.round(Math.round(this._value / this._tick)*this._tick *pow)/ pow;
+		if (this._tick !=0){
+			var pow=Math.pow(10,(this._tick+"").length-1);
+			this._value=Math.round(Math.round(this._value / this._tick)*this._tick *pow)/ pow;
+		}
 		if (this._value !=oldValue){
 			this.sendChangeEvent();
 		}
@@ -2278,8 +2329,10 @@ var Slider=(function(_super){
 	*改变滑块的位置值。
 	*/
 	__proto.changeValue=function(){
-		var pow=Math.pow(10,(this._tick+"").length-1);
-		this._value=Math.round(Math.round(this._value / this._tick)*this._tick *pow)/ pow;
+		if (this.tick !=0){
+			var pow=Math.pow(10,(this._tick+"").length-1);
+			this._value=Math.round(Math.round(this._value / this._tick)*this._tick *pow)/ pow;
+		}
 		this._value=this._value > this._max ? this._max :this._value < this._min ? this._min :this._value;
 		var num=this._max-this._min;
 		if (num===0)num=1;
@@ -4640,7 +4693,7 @@ var ComboBox=(function(_super){
 				py=py+this._listHeight <=Laya.stage.height ? py :p.y-this._listHeight;
 				this._list.pos(p.x,py);
 				this._list.zOrder=1001;
-				Laya._currentStage.addChild(this._list);
+				this.parent.addChild(this._list);
 				Laya.stage.once(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.removeList);
 				Laya.stage.on(/*laya.events.Event.MOUSE_WHEEL*/"mousewheel",this,this._onStageMouseWheel);
 				this._list.selectedIndex=this._selectedIndex;
@@ -4801,7 +4854,7 @@ var WXOpenDataViewer=(function(_super){
 
 	/**向开放数据域发送消息*/
 	__proto.postMsg=function(msg){
-		if (window.wx){
+		if (window.wx && window.wx.getOpenDataContext){
 			var openDataContext=window.wx.getOpenDataContext();
 			openDataContext.postMessage(msg);
 		}
@@ -5453,6 +5506,8 @@ var Dialog=(function(_super){
 		this._dragArea=null;
 		/**@private */
 		this._param=null;
+		/**@private */
+		this._effectTween=null;
 		Dialog.__super.call(this);
 		this.popupEffect=Dialog.manager.popupEffectHandler;
 		this.closeEffect=Dialog.manager.closeEffectHandler;
@@ -6270,8 +6325,6 @@ var AdvImage=(function(_super){
 		this._resquestTime=360000;
 		/**微信跳转appid**/
 		this._appid=null;
-		/**二维码图片地址**/
-		this._appCodeImgStr=null;
 		/**播放索引**/
 		this._playIndex=0;
 		/**轮播间隔时间**/
@@ -6279,20 +6332,29 @@ var AdvImage=(function(_super){
 		AdvImage.__super.call(this);
 		this._http=new Browser.window.XMLHttpRequest();
 		this.skin=skin;
+		this.setLoadUrl();
 		this.init();
 		this.size(120,120);
 	}
 
 	__class(AdvImage,'laya.ui.AdvImage',_super);
 	var __proto=AdvImage.prototype;
+	/**设置导量加载地址**/
+	__proto.setLoadUrl=function(){
+		if(Browser.onLimixiu){
+			this.resUrl="https://abc.layabox.com/public/wyw/gconfig.json";
+		}
+	}
+
 	__proto.init=function(){
-		if(Browser.onMiniGame && this.isSupportJump){
-			Laya.timer.loop(this._resquestTime,this,this.onGetAdvsListData);
+		if(this.isSupportJump()){
+			if(Browser.onMiniGame || Browser.onBDMiniGame){
+				Laya.timer.loop(this._resquestTime,this,this.onGetAdvsListData);
+			}
 			this.onGetAdvsListData();
 			this.initEvent();
-			}else{
-			this.visible=false;
-		}
+		}else
+		this.visible=false;
 	}
 
 	__proto.initEvent=function(){
@@ -6308,8 +6370,35 @@ var AdvImage=(function(_super){
 	__proto.revertAdvsData=function(){
 		if(this.advsListArr[this._playIndex]){
 			this.visible=true;
-			this.skin=this.advsListArr[this._playIndex];
+			if(Browser.onLimixiu){
+				var ww="https://abc.layabox.com/public/icon/";
+				this.visible=true;
+				var advsObj=this.advsListArr[this._playIndex];
+				if(advsObj){
+					if(Browser.onLimixiu &&/*__JS__ */GameStatusInfo.gameId==advsObj.gameid){
+						this.onLunbo();
+						}else{
+						this.skin=ww+advsObj.iconUrl;
+						this.size(103,126);
+					}
+				}
+				}else{
+				this.skin=this.advsListArr[this._playIndex];
+			}
 		}
+	}
+
+	/**当前小游戏环境是否支持游戏跳转功能**/
+	__proto.isSupportJump=function(){
+		if(Browser.onMiniGame){
+			var isSupperJump=(typeof /*__JS__ */wx.navigateToMiniProgram=='function');
+			return isSupperJump;
+			}else if(Browser.onLimixiu){
+			if(/*__JS__ */BK.QQ.skipGame)
+				return true;
+		}else if(Browser.onBDMiniGame)
+		return true;
+		return false;
 	}
 
 	/**
@@ -6318,25 +6407,49 @@ var AdvImage=(function(_super){
 	*/
 	__proto.jumptoGame=function(){
 		var _$this=this;
-		if(!Browser.onMiniGame)
-			return;
-		if(this.isSupportJump){
-			/*__JS__ */wx.navigateToMiniProgram({
-				appId:this._appid,
-				path:"",
-				extraData:"",
-				envVersion:"release",
-				success:function success (){
-					console.log("-------------跳转成功--------------");
-				},
-				fail:function fail (){
-					console.log("-------------跳转失败--------------");
-				},
-				complete:function complete (){
-					console.log("-------------跳转接口调用成功--------------");
-					_$this.updateAdvsInfo();
-				}.bind(this)
-			});
+		var advsObj=this.advsListArr[this._playIndex];
+		var desGameId=parseInt(advsObj.gameid);
+		var extendInfo=advsObj.extendInfo;
+		var path=advsObj.path;
+		if(Browser.onLimixiu){
+			if(!advsObj.isLunBo){
+				if(!advsObj.isLunBo){
+					var gameAdvsObj=LocalStorage.getJSON("gameObj");
+					if(!gameAdvsObj){
+						gameAdvsObj={};
+					}
+					if(!gameAdvsObj[advsObj.gameid]){
+						gameAdvsObj[advsObj.gameid]={};
+					}
+					gameAdvsObj[advsObj.gameid]={isclick:true};
+					LocalStorage.setJSON("gameObj",gameAdvsObj);
+					this.advsListArr.splice(this._playIndex,1);
+				}
+			}
+			/*__JS__ */BK.QQ.skipGame(desGameId,extendInfo);
+			this.updateAdvsInfo();
+			}else if(Browser.onMiniGame){
+			if(this.isSupportJump()){
+				/*__JS__ */wx.navigateToMiniProgram({
+					appId:advsObj.gameid,
+					path:path,
+					extraData:extendInfo,
+					envVersion:"release",
+					success:function success (){
+						console.log("-------------跳转成功--------------");
+					},
+					fail:function fail (){
+						console.log("-------------跳转失败--------------");
+					},
+					complete:function complete (){
+						console.log("-------------跳转接口调用成功--------------");
+						_$this.updateAdvsInfo();
+					}.bind(this)
+				});
+			}
+			}else if(Browser.onBDMiniGame){
+			}else{
+			this.visible=false;
 		}
 	}
 
@@ -6365,7 +6478,7 @@ var AdvImage=(function(_super){
 	*/
 	__proto.onGetAdvsListData=function(){
 		var _this=this;
-		var random=this.randRange(10000,1000000);
+		var random=AdvImage.randRange(10000,1000000);
 		var url=this.resUrl+"?"+random;
 		this._http.open("get",url,true);
 		this._http.setRequestHeader("Content-Type","application/x-www-form-urlencoded")
@@ -6377,15 +6490,6 @@ var AdvImage=(function(_super){
 			_this._onLoad(e);
 		}
 		this._http.send(null);
-	}
-
-	/**
-	*生成指定范围的随机数
-	*@param minNum 最小值
-	*@param maxNum 最大值
-	*/
-	__proto.randRange=function(minNum,maxNum){
-		return (Math.floor(Math.random()*(maxNum-minNum+1))+minNum);
 	}
 
 	/**
@@ -6430,15 +6534,37 @@ var AdvImage=(function(_super){
 		try {
 			this._data=this._http.response || this._http.responseText;
 			this._data=JSON.parse(this._data);
-			this.advsListArr=this._data.list;
-			this._appid=this._data.appid;
-			this._appCodeImgStr=this._data.qrcode;
-			this.updateAdvsInfo();
-			this.revertAdvsData();
+			if(Browser.onLimixiu){
+				this.advsListArr=this.getAdvsQArr(this._data);
+				if(this.advsListArr.length){
+					this.updateAdvsInfo();
+					this.revertAdvsData();
+					}else{
+					this.visible=false;
+				}
+				}else{
+				this.advsListArr=this._data.list;
+				this._appid=this._data.appid;
+				this.updateAdvsInfo();
+				this.revertAdvsData();
+			}
 			}catch (e){
 			flag=false;
 			this.error(e.message);
 		}
+	}
+
+	/**转换数据**/
+	__proto.getAdvsQArr=function(data){
+		var tempArr=[];
+		var gameAdvsObj=LocalStorage.getJSON("gameObj");
+		for(var key in data){
+			var tempObj=data[key];
+			if(gameAdvsObj && gameAdvsObj[tempObj.gameid] && !tempObj.isQiangZhi)
+				continue ;
+			tempArr.push(tempObj);
+		}
+		return tempArr;
 	}
 
 	/**
@@ -6452,20 +6578,15 @@ var AdvImage=(function(_super){
 
 	__proto.destroy=function(destroyChild){
 		(destroyChild===void 0)&& (destroyChild=true);
-		_super.prototype.destroy.call(this,true);
 		Laya.timer.clear(this,this.onLunbo);
-		Laya.timer.clear(this,this.onGetAdvsListData);
+		_super.prototype.destroy.call(this,true);
 		this.clear();
+		Laya.timer.clear(this,this.onGetAdvsListData);
 	}
 
-	/**当前小游戏环境是否支持游戏跳转功能**/
-	__getset(0,__proto,'isSupportJump',function(){
-		if(Browser.onMiniGame){
-			var isSupperJump=(typeof /*__JS__ */wx.navigateToMiniProgram=='function');
-			return isSupperJump;
-		}
-		return false;
-	});
+	AdvImage.randRange=function(minNum,maxNum){
+		return (Math.floor(Math.random()*(maxNum-minNum+1))+minNum);
+	}
 
 	return AdvImage;
 })(Image)
@@ -6487,6 +6608,8 @@ var Panel=(function(_super){
 		this._scrollChanged=false;
 		/**@private */
 		this._usedCache=null;
+		/**@private */
+		this._elasticEnabled=false;
 		Panel.__super.call(this);
 		this.width=this.height=100;
 	}
@@ -6693,6 +6816,7 @@ var Panel=(function(_super){
 			laya.display.Node.prototype.addChild.call(this,this._hScrollBar=new HScrollBar());
 			this._hScrollBar.on(/*laya.events.Event.CHANGE*/"change",this,this.onScrollBarChange,[this._hScrollBar]);
 			this._hScrollBar.target=this._content;
+			this._hScrollBar.elasticDistance=this._elasticEnabled ? 200 :0;
 			this._setScrollChanged();
 		}
 		this._hScrollBar.skin=value;
@@ -6706,7 +6830,7 @@ var Panel=(function(_super){
 		var max=0;
 		for (var i=this._content.numChildren-1;i >-1;i--){
 			var comp=this._content.getChildAt(i);
-			max=Math.max(comp._x+comp.width *comp.scaleX,max);
+			max=Math.max(comp._x+comp.width *comp.scaleX-comp.pivotX,max);
 		}
 		return max;
 	});
@@ -6719,7 +6843,7 @@ var Panel=(function(_super){
 		var max=0;
 		for (var i=this._content.numChildren-1;i >-1;i--){
 			var comp=this._content.getChildAt(i);
-			max=Math.max(comp._y+comp.height *comp.scaleY,max);
+			max=Math.max(comp._y+comp.height *comp.scaleY-comp.pivotY,max);
 		}
 		return max;
 	});
@@ -6762,10 +6886,10 @@ var Panel=(function(_super){
 			laya.display.Node.prototype.addChild.call(this,this._vScrollBar=new VScrollBar());
 			this._vScrollBar.on(/*laya.events.Event.CHANGE*/"change",this,this.onScrollBarChange,[this._vScrollBar]);
 			this._vScrollBar.target=this._content;
+			this._vScrollBar.elasticDistance=this._elasticEnabled ? 200 :0;
 			this._setScrollChanged();
 		}
-		if (value && value !=" ")
-			this._vScrollBar.skin=value;
+		this._vScrollBar.skin=value;
 	});
 
 	/**
@@ -6785,6 +6909,19 @@ var Panel=(function(_super){
 			}else {
 			this._hScrollBar && this._hScrollBar.off(/*laya.events.Event.START*/"start",this,this.onScrollStart);
 			this._vScrollBar && this._vScrollBar.off(/*laya.events.Event.START*/"start",this,this.onScrollStart);
+		}
+	});
+
+	/**是否开启橡皮筋效果*/
+	__getset(0,__proto,'elasticEnabled',function(){
+		return this._elasticEnabled;
+		},function(value){
+		this._elasticEnabled=value;
+		if (this._vScrollBar){
+			this._vScrollBar.elasticDistance=value ? 200 :0;
+		}
+		if (this._hScrollBar){
+			this._hScrollBar.elasticDistance=value ? 200 :0;
 		}
 	});
 
@@ -8236,6 +8373,9 @@ var List=(function(_super){
 		this._cellChanged=false;
 		/**@private */
 		this._usedCache=null;
+		/**@private */
+		this._elasticEnabled=false;
+		this._preLen=0;
 		List.__super.call(this);
 		this._cells=[];
 		this._offset=new Point();
@@ -8426,7 +8566,7 @@ var List=(function(_super){
 	__proto.setContentSize=function(width,height){
 		this._content.width=width;
 		this._content.height=height;
-		if (this._scrollBar||this._offset.x!=0||this._offset.y!=0){
+		if (this._scrollBar || this._offset.x !=0 || this._offset.y !=0){
 			this._content._style.scrollRect || (this._content.scrollRect=Rectangle.create());
 			this._content._style.scrollRect.setTo(-this._offset.x,-this._offset.y,width,height);
 			this._content.scrollRect=this._content.scrollRect;
@@ -8605,13 +8745,22 @@ var List=(function(_super){
 	*/
 	__proto.updateArray=function(array){
 		this._array=array;
+		var freshStart=0;
+		if (this._array){
+			freshStart=this._preLen-this._startIndex;
+			if (freshStart >=0)
+				this.renderItems(freshStart);
+			this._preLen=this._array.length;
+		}
 		if (this._scrollBar){
 			var length=array.length;
 			var numX=this._isVertical ? this.repeatX :this.repeatY;
 			var numY=this._isVertical ? this.repeatY :this.repeatX;
 			var lineCount=Math.ceil(length / numX);
-			this._scrollBar.thumbPercent=numY / lineCount;
-			this._scrollBar.slider["_max"]=(lineCount-numY)*this._cellSize+this._cellOffset;
+			if (lineCount >=numY){
+				this._scrollBar.thumbPercent=numY / lineCount;
+				this._scrollBar.slider["_max"]=(lineCount-numY)*this._cellSize+this._cellOffset;
+			}
 		}
 	}
 
@@ -8796,8 +8945,8 @@ var List=(function(_super){
 		var scrollBar=new VScrollBar();
 		scrollBar.name="scrollBar";
 		scrollBar.right=0;
-		if (value && value !=" ")
-			scrollBar.skin=value;
+		scrollBar.skin=value;
+		scrollBar.elasticDistance=this._elasticEnabled ? 200 :0;
 		this.scrollBar=scrollBar;
 		this.addChild(scrollBar);
 		this._setCellChanged();
@@ -8827,8 +8976,8 @@ var List=(function(_super){
 		var scrollBar=new HScrollBar();
 		scrollBar.name="scrollBar";
 		scrollBar.bottom=0;
-		if (value && value !=" ")
-			scrollBar.skin=value;
+		scrollBar.skin=value;
+		scrollBar.elasticDistance=this._elasticEnabled ? 200 :0;
 		this.scrollBar=scrollBar;
 		this.addChild(scrollBar);
 		this._setCellChanged();
@@ -8956,6 +9105,7 @@ var List=(function(_super){
 		},function(value){
 		this.runCallLater(this.changeCells);
 		this._array=value || [];
+		this._preLen=this._array.length;
 		var length=this._array.length;
 		this.totalPage=Math.ceil(length / (this.repeatX *this.repeatY));
 		this._selectedIndex=this._selectedIndex < length ? this._selectedIndex :length-1;
@@ -8966,7 +9116,7 @@ var List=(function(_super){
 			var numY=this._isVertical ? this.repeatY :this.repeatX;
 			var lineCount=Math.ceil(length / numX);
 			var total=this._cellOffset > 0 ? this.totalPage+1 :this.totalPage;
-			if (total > 1){
+			if (total > 1 && lineCount >=numY){
 				this._scrollBar.scrollSize=this._cellSize;
 				this._scrollBar.thumbPercent=numY / lineCount;
 				this._scrollBar.setScroll(0,(lineCount-numY)*this._cellSize+this._cellOffset,this._scrollBar.value);
@@ -8992,6 +9142,16 @@ var List=(function(_super){
 	__getset(0,__proto,'cells',function(){
 		this.runCallLater(this.changeCells);
 		return this._cells;
+	});
+
+	/**是否开启橡皮筋效果*/
+	__getset(0,__proto,'elasticEnabled',function(){
+		return this._elasticEnabled;
+		},function(value){
+		this._elasticEnabled=value;
+		if (this._scrollBar){
+			this._scrollBar.elasticDistance=value?200:0;
+		}
 	});
 
 	return List;

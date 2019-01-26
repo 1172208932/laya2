@@ -1089,7 +1089,11 @@ var ShareManager = /** @class */ (function () {
     /**分享主要方法，需要传入所有参数 */
     ShareManager.share = function (title, image, query, success, fail) {
         if (fail === void 0) { fail = null; }
-        if (!image && !this.imageURL) {
+        var imageURL = image;
+        if (!imageURL) {
+            imageURL = this.getShareImageURL();
+        }
+        if (!imageURL) {
             console.error("必须指定分享图片地址，建议使用ShareManager.imageURL全局设置统一分享图片");
             return;
         }
@@ -1120,10 +1124,12 @@ var ShareManager = /** @class */ (function () {
     /**分享方法，可以不用传入图片，图片将从 ShareManager.imageURL 获取 */
     ShareManager.shareTitle = function (title, query, success, fail) {
         if (fail === void 0) { fail = null; }
-        if (!this.imageURL) {
+        var imageURL = this.getShareImageURL();
+        if (!imageURL) {
             console.error("必须指定 ShareManager.imageURL 才可执行此方法");
+            return;
         }
-        this.share(title, this.imageURL, query, success, fail);
+        this.share(title, imageURL, query, success, fail);
     };
     /**获取分享内容 */
     ShareManager.getShareInfo = function (shareTicket, suc, fail) {
@@ -1136,6 +1142,17 @@ var ShareManager = /** @class */ (function () {
             },
             fail: fail
         });
+    };
+    ShareManager.getShareImageURL = function () {
+        var imageURL = null;
+        if (this.makeShareImageURLHandler) {
+            imageURL = this.makeShareImageURLHandler();
+        }
+        if (typeof imageURL !== 'string') {
+            imageURL = this.imageURL;
+            console.warn('ShareManager.makeShareImageURLHandler 必须返回 string 类型的图片地址');
+        }
+        return imageURL;
     };
     /**是否验证群ID */
     ShareManager.checkGroup = false;
@@ -1760,8 +1777,14 @@ var Utils = /** @class */ (function () {
         if (icon == "") {
             return "local/common/avstar.png";
         }
-        if (icon.indexOf('Game') == 0)
-            return icon; //GameRes 或 GameSandBox
+        if (icon.indexOf('Game') == 0) { //GameRes 或 GameSandBox
+            if (window['BK']) {
+                return icon;
+            }
+            else {
+                return '';
+            }
+        }
         if (icon.indexOf('http') === 0) {
             var items = icon.split("/") || [];
             if (items.length > 1) {
@@ -2066,6 +2089,7 @@ var RewardedVideoAd = /** @class */ (function (_super) {
                 res = { isEnded: true };
             }
             _this.event(RewardedVideoAd.CLOSE, res);
+            _export__WEBPACK_IMPORTED_MODULE_0__["SoundManager"].onAudioInterruptionEnd();
         });
         this.videoAd = videoAd;
     };
@@ -2098,6 +2122,7 @@ var RewardedVideoAd = /** @class */ (function (_super) {
         ad.on(this.LOAD, this, params.onLoad);
         ad.on(this.ERROR, this, params.onError);
         ad.on(this.CLOSE, this, params.onClose);
+        _export__WEBPACK_IMPORTED_MODULE_0__["SoundManager"].onAudioInterruptionBegin();
         ad.show();
     };
     RewardedVideoAd.LOAD = 'load_ad';
@@ -2133,14 +2158,15 @@ var __extends = (undefined && undefined.__extends) || (function () {
 var BannerAd = /** @class */ (function (_super) {
     __extends(BannerAd, _super);
     function BannerAd(params) {
+        if (params === void 0) { params = {}; }
         var _this_1 = _super.call(this) || this;
         params.adUnitId = params.adUnitId || _export__WEBPACK_IMPORTED_MODULE_0__["DataCenter"].bannerUnitId;
         params.viewId = params.qqViewId || _export__WEBPACK_IMPORTED_MODULE_0__["DataCenter"].qqViewId;
         if (!params.style) {
             var style = {};
             if (window['wx']) {
-                style.x = style.y = 0;
-                style.width = 300;
+                style.top = style.left = 0;
+                style.width = Laya.Browser.clientWidth || 300;
             }
             else if (window['BK']) {
                 style.x = 0;
@@ -2160,7 +2186,7 @@ var BannerAd = /** @class */ (function (_super) {
             ad.onResize(function (res) {
                 var bannerAd = ad['bannerAd'];
                 bannerAd.style.left = (screenWidth_1 - res.width) / 2;
-                if (params.style.top === void 0) {
+                if (!params.style.top) {
                     bannerAd.style.top = screenHeight_1 - res.height;
                 }
                 _this.event(BannerAd.RESIZE, [bannerAd, res, screenWidth_1, screenHeight_1]);
@@ -2377,7 +2403,8 @@ var commonScenes = {
     RankView: 'common/Rank/RankView',
     RankGroupView: 'common/Rank/RankGroupView',
     QTRoomView: 'common/QTRoom/QTRoomView',
-    HomeView: 'HomeView'
+    HomeView: 'HomeView',
+    FBView: 'common/InviteFriend/FBView'
 };
 var Navigator = /** @class */ (function (_super) {
     __extends(Navigator, _super);
@@ -2532,7 +2559,7 @@ var Navigator = /** @class */ (function (_super) {
             this.visibleScene = scene;
             this.scenes.push(scene);
             this._onAppear();
-            complete && complete.run();
+            complete && complete.runWith(scene);
         }), progress);
     };
     Navigator.setupLoadingPage = function (isFirstScene, cb) {
@@ -3360,6 +3387,8 @@ var Main = /** @class */ (function (_super) {
         }
     };
     Main.prototype._onShow = function (res) {
+        if (!this.socket)
+            return;
         this.isFirstLaunch = false;
         this.launchOption = res;
         //当通过好友邀请进入游戏时，需要再次调用登录，以获取好友所在的服务器
@@ -3384,6 +3413,8 @@ var Main = /** @class */ (function (_super) {
         _laya_sound__WEBPACK_IMPORTED_MODULE_15__["default"].onShow();
     };
     Main.prototype._onHide = function (res) {
+        if (!this.socket)
+            return;
         this.navigator._onHide(res);
         this.onHide(res);
         _laya_sound__WEBPACK_IMPORTED_MODULE_15__["default"].onHide();
@@ -3554,29 +3585,36 @@ var Game = /** @class */ (function (_super) {
             files.push('local');
             Laya.MiniAdpter.nativefiles = files;
         }
-        if (Laya.URL.customFormat) {
-            Laya.URL['formatURLCopy'] = Laya.URL.customFormat;
+        if (Laya.URL.formatURL) {
+            Laya.URL['formatURLCopy'] = Laya.URL.formatURL;
         }
-        Laya.URL.customFormat = function (url) {
-            if (!url)
-                return;
-            if (url.indexOf('http') >= 0)
-                return url;
-            if (!_this.loadNetworkRes) {
-                if (Laya.URL['formatURLCopy']) {
-                    return Laya.URL['formatURLCopy'](url);
-                }
-                else {
-                    return url;
-                }
-            }
-            if (url.indexOf('remote/') > -1) {
-                return _DataCenter__WEBPACK_IMPORTED_MODULE_0__["default"].RESURL + url;
-            }
+        Laya.URL.formatURL = function (url) {
             if (Laya.URL['formatURLCopy']) {
-                return Laya.URL['formatURLCopy'](url);
+                url = Laya.URL['formatURLCopy'](url);
+            }
+            if (_this.loadNetworkRes && url.indexOf('remote/') >= 0 && url.indexOf('http') < 0) {
+                url = _DataCenter__WEBPACK_IMPORTED_MODULE_0__["default"].RESURL + url;
             }
             return url;
+            // if (!url) return 'null path'
+            // if (url.indexOf('http') >= 0) return url
+            // if (!this.loadNetworkRes) {
+            //     if (Laya.URL['formatURLCopy']) {
+            //         return Laya.URL['formatURLCopy'](url)
+            //     } else {
+            //         return url
+            //     }
+            // }
+            // if (url.indexOf('remote/') >= 0) {
+            //     if (Laya.URL['formatURLCopy']) {
+            //         url = Laya.URL['formatURLCopy'](url)
+            //     }
+            //     return DataCenter.RESURL + url
+            // }
+            // if (Laya.URL['formatURLCopy']) {
+            //     return Laya.URL['formatURLCopy'](url)
+            // }
+            // return url
         };
         //兼容微信不支持加载scene后缀场景
         Laya.URL.exportSceneToJson = true;
@@ -3955,40 +3993,30 @@ var SoundManager = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     SoundManager.onShow = function () {
-        this._windowFocus();
+        // this._windowFocus()
         this.onShowHandler && this.onShowHandler();
     };
     SoundManager.onHide = function () {
-        this._windowBlur();
+        // this._windowBlur()
         this.onHideHandler && this.onHideHandler();
     };
     SoundManager.onAudioInterruptionBegin = function () {
-        this._windowBlur();
+        // this._windowBlur()
         this.onAudioInterruptionBeginHandler && this.onAudioInterruptionBeginHandler();
     };
     SoundManager.onAudioInterruptionEnd = function () {
-        this._windowFocus();
+        // this._windowFocus()
         this.onAudioInterruptionEndHandler && this.onAudioInterruptionEndHandler();
     };
     SoundManager._windowFocus = function () {
-        if (window.dispatchEvent) {
-            window.dispatchEvent(new Event('focus'));
-        }
-        else {
-            Laya.stage['_isFocused'] = true;
-            Laya.stage.event(/*laya.events.Event.FOCUS*/ "focus");
-            Laya.stage.event(/*laya.events.Event.FOCUS_CHANGE*/ "focuschange");
-        }
+        Laya.stage['_isFocused'] = true;
+        Laya.stage.event(/*laya.events.Event.FOCUS*/ "focus");
+        Laya.stage.event(/*laya.events.Event.FOCUS_CHANGE*/ "focuschange");
     };
     SoundManager._windowBlur = function () {
-        if (window.dispatchEvent) {
-            window.dispatchEvent(new Event('blur'));
-        }
-        else {
-            Laya.stage['_isFocused'] = false;
-            Laya.stage.event(/*laya.events.Event.BLUR*/ "blur");
-            Laya.stage.event(/*laya.events.Event.FOCUS_CHANGE*/ "focuschange");
-        }
+        Laya.stage['_isFocused'] = false;
+        Laya.stage.event(/*laya.events.Event.BLUR*/ "blur");
+        Laya.stage.event(/*laya.events.Event.FOCUS_CHANGE*/ "focuschange");
     };
     return SoundManager;
 }(Laya.SoundManager));
@@ -4384,7 +4412,7 @@ Laya.Node.prototype.addClickListener = function (caller, method, throttle, fail)
             return;
         }
         var now = Date.now(), time = caller[LAST_CLICK_TIME] || 0, delta = now - time;
-        if (delta > 500) {
+        if (delta > 1000) {
             method.call(caller, args);
         }
         else {

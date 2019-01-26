@@ -6,11 +6,9 @@ import GameAgainControl from "./scripts/common/GameResult/GameAgainControl"
 import GameListOrBannerControl from "./scripts/common/GameResult/GameListOrBannerControl"
 import TurnTableView from "./scripts/common/GameResult/TurnTableView"
 import TurnTableControl from "./scripts/common/GameResult/TurnTableControl"
-import UserView from "./scripts/prefab/UserView"
-import Task from "./scripts/prefab/Task"
-import IFHostControl from "./scripts/common/IFService/IFHostControl"
-import IFMemberView from "./scripts/common/IFService/IFMemberView"
-import IFMemberControl from "./scripts/common/IFService/IFMemberControl"
+import FBView from "./scripts/common/FriendBattle/FBView"
+import NewTask from "./scripts/prefab/NewTask"
+import FBControl from "./scripts/common/FriendBattle/FBControl"
 import LoadingView from "./scripts/common/Loading/LoadingView"
 import LoadingControl from "./scripts/common/Loading/LoadingControl"
 import IntegralMallView from "./scripts/common/IntegralMallView"
@@ -21,9 +19,11 @@ import IntegralMallControl from "./scripts/common/IntegralMallControl"
 import MatchGradeView from "./scripts/common/MatchGradeService/MatchGradeView"
 import BackUpDialogButton from "./scripts/prefab/BackUpDialogButton"
 import SkipMall from "./scripts/prefab/SkipMall"
+import FBButton from "./scripts/common/FriendBattle/FBButton"
 import Marquee from "./scripts/prefab/Marquee"
 import MatchGradeControl from "./scripts/common/MatchGradeService/MatchGradeControl"
 import MatchView from "./scripts/common/MatchService/MatchView"
+import UserView from "./scripts/prefab/UserView"
 import MatchControl from "./scripts/common/MatchService/MatchControl"
 import QTRoomView from "./scripts/common/QTRoom/QTRoomView"
 import QTRoomControl from "./scripts/common/QTRoom/QTRoomControl"
@@ -50,6 +50,7 @@ import NotEnoughDialog from "./scripts/dialog/NotEnoughDialog"
 import NoVideoDialog from "./scripts/dialog/NoVideoDialog"
 import RouletteRewardDialog from "./scripts/common/View/RouletteRewardDialog"
 import SettingDialog from "./scripts/dialog/SettingDialog"
+import TaskDialog from "./scripts/dialog/TaskDialog"
 import TaskReward from "./scripts/dialog/TaskReward"
 import MoreGameButton from "./scripts/prefab/MoreGameButton"
 import HomeControl from "./scripts/common/HomeControl"
@@ -67,11 +68,9 @@ export default class GameConfig {
 		reg("scripts/common/GameResult/GameListOrBannerControl.js",GameListOrBannerControl);
 		reg("scripts/common/GameResult/TurnTableView.js",TurnTableView);
 		reg("scripts/common/GameResult/TurnTableControl.js",TurnTableControl);
-		reg("scripts/prefab/UserView.js",UserView);
-		reg("scripts/prefab/Task.js",Task);
-		reg("scripts/common/IFService/IFHostControl.js",IFHostControl);
-		reg("scripts/common/IFService/IFMemberView.js",IFMemberView);
-		reg("scripts/common/IFService/IFMemberControl.js",IFMemberControl);
+		reg("scripts/common/FriendBattle/FBView.js",FBView);
+		reg("scripts/prefab/NewTask.js",NewTask);
+		reg("scripts/common/FriendBattle/FBControl.js",FBControl);
 		reg("scripts/common/Loading/LoadingView.js",LoadingView);
 		reg("scripts/common/Loading/LoadingControl.js",LoadingControl);
 		reg("scripts/common/IntegralMallView.js",IntegralMallView);
@@ -82,9 +81,11 @@ export default class GameConfig {
 		reg("scripts/common/MatchGradeService/MatchGradeView.js",MatchGradeView);
 		reg("scripts/prefab/BackUpDialogButton.js",BackUpDialogButton);
 		reg("scripts/prefab/SkipMall.js",SkipMall);
+		reg("scripts/common/FriendBattle/FBButton.js",FBButton);
 		reg("scripts/prefab/Marquee.js",Marquee);
 		reg("scripts/common/MatchGradeService/MatchGradeControl.js",MatchGradeControl);
 		reg("scripts/common/MatchService/MatchView.js",MatchView);
+		reg("scripts/prefab/UserView.js",UserView);
 		reg("scripts/common/MatchService/MatchControl.js",MatchControl);
 		reg("scripts/common/QTRoom/QTRoomView.js",QTRoomView);
 		reg("scripts/common/QTRoom/QTRoomControl.js",QTRoomControl);
@@ -111,6 +112,7 @@ export default class GameConfig {
 		reg("scripts/dialog/NoVideoDialog.js",NoVideoDialog);
 		reg("scripts/common/View/RouletteRewardDialog.js",RouletteRewardDialog);
 		reg("scripts/dialog/SettingDialog.js",SettingDialog);
+		reg("scripts/dialog/TaskDialog.js",TaskDialog);
 		reg("scripts/dialog/TaskReward.js",TaskReward);
 		reg("scripts/prefab/MoreGameButton.js",MoreGameButton);
 		reg("scripts/common/HomeControl.js",HomeControl);
@@ -124,7 +126,7 @@ GameConfig.scaleMode ="fixedwidth";
 GameConfig.screenMode = "none";
 GameConfig.alignV = "top";
 GameConfig.alignH = "left";
-GameConfig.startScene = "scenes/common/GameResult/GameResultView.scene";
+GameConfig.startScene = "scenes/common/Loading/LoadWaitingView.scene";
 GameConfig.sceneRoot = "";
 GameConfig.debug = false;
 GameConfig.stat = false;

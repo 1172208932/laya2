@@ -4,7 +4,9 @@ export default class Utils {
     static checkIfHasEnoughMoney(cost) {
         let gold = PaoYa.DataCenter.user.gold
         if (gold < cost) {
-            PaoYa.navigator.popup('NotEnoughDialog')  
+            PaoYa.DataCenter.recordPointDialog = true
+            Utils.recordPoint('exposure001','view')
+            PaoYa.navigator.popup('NotEnoughDialog')
             return false
         }
         return true
@@ -20,7 +22,7 @@ export default class Utils {
             //刷新豆子
             PaoYa.DataCenter.refreshUserInfo();
         }, function (message) {
-            var message = `今日广告奖励已达上限，您可以免费和好友玩哦!\n下载"泡泡游戏"app,每日签到领豆子.`;
+            var message = `今日广告奖励已达上限，您可以免费和好友玩哦!\n关注"泡泡游戏"公众号,每日签到领豆子.`;
             let alert = new AlertDialog({
                 title: '温馨提示',
                 message: message,
@@ -150,18 +152,7 @@ export default class Utils {
             alert.popup();
             return;
         }
-        if (PaoYa.DataCenter.isNew) {
-            let alert = new AlertDialog({
-                title: '温馨提示',
-                message: '暂未开放充值\n下载"泡泡游戏"app，每日签到领豆子。',
-                cancelText: `发送"1"下载`,
-                confirmText: "跳过",
-                cancelHandler: function () {
-                    Utils.openCustomer();
-                }
-            })
-            alert.popup();
-        } else if (Laya.Browser.onIOS) {
+        if (PaoYa.DataCenter.isNew || Laya.Browser.onIOS) {
             let alert = new AlertDialog({
                 title: '领取豆子',
                 message: "关注“泡泡游戏”公众号，免费领豆子，还能抢先玩游戏哦。",
@@ -172,8 +163,7 @@ export default class Utils {
                 }
             })
             alert.popup();
-        }
-        else {
+        } else {
             if (!PaoYa.DataCenter.config.item_list) {
                 return;
             }
@@ -236,7 +226,7 @@ export default class Utils {
                 message: '广告观看已达上限，请分享之后继续',
                 confirmText: '分享',
                 confirmHandler() {
-                    let title = DataCenter.config.game.share_list.randomItem
+                    let title = PaoYa.DataCenter.config.game.share_list.randomItem
                     PaoYa.ShareManager.shareTitle(title, {}, () => {
                         completion()
                     })
@@ -260,8 +250,10 @@ export default class Utils {
         }
         PaoYa.RewardedVideoAd.show(p)
     }
-    static loadOtherGameList(num, resolve) {
-        Laya.loader.load('gameConfig.json', Laya.Handler.create(this, (res) => {
+    static loadOtherGameList(num, cb) {
+        /**资源已在GameMain中提前加载，所以此处只需要使用即可 */
+        let res = Laya.loader.getRes('gameConfig.json')
+        // Laya.loader.load('gameConfig.json', Laya.Handler.create(this, (res) => {
             res.navigateToMiniProgramAppIdList ? this.appId = res.navigateToMiniProgramAppIdList : console.error('请在gameConfig中设置游戏白名单')
             let shareInfo = JSON.parse(JSON.stringify(this.appId));
             let spineInfo = [];
@@ -269,7 +261,10 @@ export default class Utils {
                 var rand = Math.floor(Math.random() * shareInfo.length);
                 spineInfo.push(shareInfo.splice(rand, 1)[0]);
             }
-            resolve(spineInfo);
-        }))
+            cb(spineInfo);
+        // }))
+    }
+    static recordPoint(name,type){
+        PaoYa.Request.POST('point_log_record', { point_name: name, point_type: type }, (res) => { })
     }
 }

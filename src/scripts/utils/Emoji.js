@@ -1,0 +1,82 @@
+const Emoji = [{
+    skinNum: 20,  
+    skin: 'remote/emoji/20_0.png',//笑脸
+    len: 2
+}, {
+    skinNum: 43,  
+    skin: 'remote/emoji/43_0.png',//委屈
+    len: 5
+}, {
+    skinNum: 6,      
+    skin: 'remote/emoji/6_0.png',//吐血
+    len: 2
+}, {
+    skinNum: 54,    
+    skin: 'remote/emoji/54_0.png',//再见
+    len: 5
+}, {
+    skinNum: 56,      
+    skin: 'remote/emoji/56_0.png',//抓狂
+    len: 7
+}, {
+    skinNum: 40,      
+    skin: 'remote/emoji/40_0.png',//偷笑
+    len: 2
+}, {
+    skinNum: 9,      
+    skin: 'remote/emoji/9_0.png',//花心
+    len: 4
+}, {
+    skinNum: 21,      
+    skin: 'remote/emoji/21_0.png',//生气
+    len: 7
+}, {
+    skinNum: 25,      
+    skin: 'remote/emoji/25_0.png',//鄙视
+    len: 4
+}, {
+    skinNum: 11,      
+    skin: 'remote/emoji/11_0.png',//酷
+    len: 6
+}, {
+    skinNum: 5,      
+    skin: 'remote/emoji/5_0.png',//笑哭
+    len: 4
+}, {
+    skinNum: 1,      
+    skin: 'remote/emoji/1_0.png',//眨眼
+    len: 2
+}, {
+    skinNum: 23,      
+    skin: 'remote/emoji/23_0.png',//斜眼
+    len: 6
+}, {
+    skinNum: 14,      
+    skin: 'remote/emoji/14_0.png',//闭嘴
+    len: 6
+}, {
+    skinNum: 65,    
+    skin: 'remote/emoji/65_0.png',//敲打
+    len: 5
+}, {
+    skinNum: 71,      
+    skin: 'remote/emoji/71_0.png',//爱心
+    len: 1
+}, {
+    skinNum: 74,      
+    skin: 'remote/emoji/74_0.png',//药丸
+    len: 1
+}, {
+    skinNum: 83,      
+    skin: 'remote/emoji/83_0.png',//耶
+    len: 4
+}, {
+    skinNum: 89,      
+    skin: 'remote/emoji/89_0.png',//好
+    len: 4
+}, {
+    skinNum: 85,      
+    skin: 'remote/emoji/85_0.png',//坏
+    len: 4
+}]
+export default Emoji

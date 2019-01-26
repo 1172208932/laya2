@@ -47,12 +47,14 @@ export default class BeanBox extends PaoYa.Component {
     onClick() {
         switch (this.boxType) {
             case '1':
+                Utils.recordPoint('button001', 'click')
                 Utils.goToCharge()
                 break
             case '2':
                 this.navigator.push('IntegralMallView')
                 break
             case '4':
+                Utils.recordPoint('button002', 'click')
                 this.navigator.popup('DepositDialog')
                 break
         }

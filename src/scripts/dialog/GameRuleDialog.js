@@ -1,4 +1,7 @@
 export default class GameRuleDialog extends PaoYa.Dialog {
+    onAwake() {
+        this.showBannerAdWhenDialogPopup = false;
+    }
     onOpened() {
         if (!PaoYa.DataCenter.ruleUrl) { console.warn('请指定规则资源地址') }
         var url = PaoYa.DataCenter.ruleUrl;

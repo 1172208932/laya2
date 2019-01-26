@@ -123,8 +123,16 @@ RouletteViewControl.showAnimateIcon = function (parent,position) {
         this.show()
     })
     s.pos(position.x||550, position.y||430)
-    let sk = new Laya.Skeleton()
-    sk.load('spine/roulette/icon.sk')
+    let sk = null
+    if(RouletteViewControl.skTemplet){
+        sk = new Laya.Skeleton(RouletteViewControl.skTemplet)
+        sk.play(0,true)
+    } else {
+        sk = new Laya.Skeleton()
+        sk.load('spine/roulette/icon.sk',Laya.Handler.create(this,function(){
+            RouletteViewControl.skTemplet = sk.templet
+        }))
+    }
     sk.pos(s.width / 2, -430)
     s.addChild(sk)
     parent.addChild(s)

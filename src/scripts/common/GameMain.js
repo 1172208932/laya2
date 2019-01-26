@@ -1,6 +1,7 @@
 import LoadingView from "./Loading/LoadingView";
 import config from "../../Config";
-
+import Emoji from "../../scripts/utils/Emoji";
+import AlertDialog from "../dialog/AlertDialog";
 export default class GameMain extends PaoYa.Main {
 
 	setupOthers() {
@@ -25,17 +26,26 @@ export default class GameMain extends PaoYa.Main {
 		['wxgame/ladder/win_lose.sk',
 			'wxgame/ladder/win_lose.png',
 			'wxgame/service/jian_tou.sk',
-			'wxgame/service/jian_tou.png'
+			'wxgame/service/jian_tou.png',
+			'wxgame/common/success.png',
+			'wxgame/common/error.png',
+			'wxgame/common/warning.png'
 		].forEach(url => {
 			resList.push(`${PaoYa.DataCenter.CDNURL}${url}`)
 		})
 
 		/**加载必要首屏界面资源 */
 		let scenes = [
+			'gameConfig.json',
+			'remote/friend/image_backg1.jpg',
+			'res/atlas/remote/friend.atlas',
+			'res/atlas/remote/emoji.atlas',
+			'res/atlas/remote/crossLink.atlas',
+			'scenes/dialog/GameAgain.scene',
 			'res/atlas/local/common.atlas',
 			'res/atlas/local/home.atlas',
 			'scenes/HomeView.scene',
-			'scenes/common/InviteFriend/IFMemberView.scene'
+			'scenes/common/InviteFriend/FBView.scene'
 		]
 		resList = resList.concat(scenes)
 		/**加载游戏界面所需资源 */
@@ -57,9 +67,18 @@ export default class GameMain extends PaoYa.Main {
 			this.jumpRootScene(launchInfo)
 		} else {
 			if (isFirstLaunch) {
+				let prepare={
+					async(cb) {
+						cb()
+						for (let i = 0; i < 20; i++) {
+							Laya.Animation.createFrames(PaoYa.Utils.makeImagesWithFormat(`remote/emoji/${Emoji[i].skinNum}_%i.png`, 0, Emoji[i].len), `emoji${i}`)
+						}
+						//SpineLoader.setup(cb)			
+					}
+				}
 				this.navigator.push("HomeView", {}, null, Laya.Handler.create(this, () => {
 					this.goToScene(launchInfo)
-				}));
+				}),null,prepare);
 			} else {
 				this.goToScene(launchInfo)
 			}
@@ -69,12 +88,13 @@ export default class GameMain extends PaoYa.Main {
 		if (!launchInfo || !launchInfo.query || !launchInfo.query.type) {
 			return
 		}
+		PaoYa.DataCenter.isJumpScene = true
 		let query = launchInfo.query
 		let scene = this.navigator.visibleScene
 		switch (parseInt(query.type)) {
 			case PaoYa.ShareType.InviteFriend:
-				if (scene.sceneName != "IFHostView" || scene.sceneName != "IFMemberView") {
-					this.navigator.push("IFMemberView", { id: query.id, rname: query.rname })
+				if (scene.sceneName != "FBView") {
+					this.navigator.push("FBView", { id: query.id, rname: query.rname })
 				} else {
 					let alert = new AlertDialog({
 						title: "提示",

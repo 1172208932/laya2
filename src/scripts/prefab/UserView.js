@@ -9,6 +9,8 @@ export default class UserView extends PaoYa.View {
         this.lblName = this.hBox.getChildByName("lblName");
         this.imgSex = this.hBox.getChildByName("imgSex");
         this.imgNameBg=this.getChildByName("imgNameBg");
+        this.lblCity.width = 190
+        this.lblCity.align = 'center'
     }
     setData(data) {
         if (data.icon != undefined) {

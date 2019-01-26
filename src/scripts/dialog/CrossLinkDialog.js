@@ -2,9 +2,14 @@ import CrossLinkControl from "./CrossLinkControl";
 import Utils from "../utils/utils";
 
 export default class CrossLinkDialog extends PaoYa.Dialog {
+    _onAdded() {
+        this.list.array = [];
+        super._onAdded()
+    }
     //交叉跳转弹框
     onAwake() {
-        this.list.array = [];
+        /**弹窗关闭时自动销毁 */
+        this.autoDestroyAtClosed = true
         if (typeof (this.params) != 'string') {
             Laya.timer.once(2000, this, () => {
                 this.btnMatch.visible = true

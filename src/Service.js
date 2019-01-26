@@ -17,14 +17,13 @@ export default class Service {
 }
  */
 Service.startGame = function (data) {
-    let scene = PaoYa.navigator.findSceneByName("GameView");
-    if (scene) {
-        scene.params = {
+    if (data.type==undefined) {
+        var params = {
             type: Service.type,
             matchData: Service.matchData,
             gameData: data
         }
-        PaoYa.navigator.popToScene("GameView");
+        PaoYa.navigator.push("GameView", params);
     } else {
         Service.type = data.type;
         Service.matchData = data.matchData;

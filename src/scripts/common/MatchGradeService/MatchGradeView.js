@@ -25,4 +25,8 @@ export default class MatchGradeView extends PaoYa.View {
         let item = MatchGradeService.findBestQuickMatchType()
         this.sessionText.text = item.name
     }
+    beginMatch(){
+        this.setQuickMatchSession() 
+        MatchGradeService.startQuickMatch()
+    }
 }

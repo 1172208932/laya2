@@ -1,10 +1,11 @@
-import GameAgainDialog from "../../dialog/GameAgainDialog";
+import Utils from "../../utils/utils";
 
 export default class GameResultView extends PaoYa.View {
     onAwake() {
-        GameAgainDialog.JSONView = Laya.loader.getRes('scenes/dialog/GameAgain.scene')
         this.dealData();
         this.initView();
+        Laya.UIConfig.closeDialogOnSide = true;
+        Laya.Dialog.manager.maskLayer.alpha=0.5;
     }
     dealData() {
         this.data = this.params.result;
@@ -12,12 +13,15 @@ export default class GameResultView extends PaoYa.View {
         let userId = PaoYa.DataCenter.user.id;
         let winUserId = this.data.win_userid;
         if (winUserId == userId) {
+            Utils.recordPoint('win001', 'gameResult')
             this.data.result = 1;
             this.imgMyResultBg.visible = true;
             this.lblMyResult.text = "胜利";
         } else if (winUserId == 0) {
+            Utils.recordPoint('draw001', 'gameResult')
             this.data.result = 0;
         } else {
+            Utils.recordPoint('lose001', 'gameResult')
             this.data.result = -1;
             this.imgOtherResultBg.visible = true;
             this.imgOtherResultBg.skin = "remote/result/icon1.png";
@@ -30,6 +34,12 @@ export default class GameResultView extends PaoYa.View {
             this.myInfo = this.data.win_user;
             this.otherInfo = this.data.lose_user;
         }
+        if(PaoYa.DataCenter.recordPointDialog){
+            Utils.recordPoint('played002','played')
+        }else{
+            Utils.recordPoint('played001','played')
+        }
+        PaoYa.DataCenter.recordPointDialog = false
         //处理匹配成功数据 获取gender和location
         this.dealMatchData();
         this.ratioType = 0;
@@ -122,7 +132,7 @@ export default class GameResultView extends PaoYa.View {
             this.lblBean.text = '+' + this.data.wheel_reward;
             if (PaoYa.DataCenter.showBeanPercent == 1) {
                 let imgBuff = new Laya.Image('remote/share/red_20.png')
-                imgBuff.pos(355, 532)
+                imgBuff.pos(355, 482)
                 this.addChild(imgBuff)
                 this.lblBean.text = '+' + parseInt(this.data.wheel_reward * 1.1);
             }

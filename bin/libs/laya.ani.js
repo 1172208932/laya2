@@ -3441,7 +3441,7 @@ var Skeleton=(function(_super){
 			}
 			}else {
 			tFactory=new Templet();
-			tFactory._setUrl(this._aniPath);
+			tFactory._setCreateURL(this._aniPath);
 			Templet.TEMPLET_DICTIONARY[this._aniPath]=tFactory;
 			tFactory.on(/*laya.events.Event.COMPLETE*/"complete",this,this._parseComplete);
 			tFactory.on(/*laya.events.Event.ERROR*/"error",this,this._parseFail);

@@ -1201,7 +1201,7 @@ var ParticleTemplate2D=(function(_super){
 					if (this._firstFreeElement > 0)
 						WebGL.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,this._firstFreeElement *6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,0);
 				}
-				Stat.drawCall++;
+				Stat.renderBatch++;
 			}
 			this._drawCounter++;
 		}
