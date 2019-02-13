@@ -2,6 +2,7 @@ import LoadingView from "./Loading/LoadingView";
 import config from "../../Config";
 import Emoji from "../../scripts/utils/Emoji";
 import AlertDialog from "../dialog/AlertDialog";
+import SettingDialog from "../dialog/SettingDialog";
 export default class GameMain extends PaoYa.Main {
 
 	setupOthers() {
@@ -21,6 +22,7 @@ export default class GameMain extends PaoYa.Main {
 	}
 
 	setupConfig() {
+		SettingDialog.setUp();
 		let resList = [];
 		/**添加必要网络资源 */
 		['wxgame/ladder/win_lose.sk',
@@ -51,7 +53,11 @@ export default class GameMain extends PaoYa.Main {
 		/**加载游戏界面所需资源 */
 		resList = resList.concat(this.setupGameRes())
 
-		PaoYa.DataCenter.GAMERES = resList
+		PaoYa.DataCenter.GAMERES = resList;
+		//分享地址
+		PaoYa.ShareManager.makeShareImageURLHandler = function () {
+			return PaoYa.DataCenter.CDNURL + PaoYa.DataCenter.config.game.share_img.randomItem;
+		};
 	}
 
 	setupLoadingView(cb) {
@@ -67,7 +73,7 @@ export default class GameMain extends PaoYa.Main {
 			this.jumpRootScene(launchInfo)
 		} else {
 			if (isFirstLaunch) {
-				let prepare={
+				let prepare = {
 					async(cb) {
 						cb()
 						for (let i = 0; i < 20; i++) {
@@ -78,7 +84,7 @@ export default class GameMain extends PaoYa.Main {
 				}
 				this.navigator.push("HomeView", {}, null, Laya.Handler.create(this, () => {
 					this.goToScene(launchInfo)
-				}),null,prepare);
+				}), null, prepare);
 			} else {
 				this.goToScene(launchInfo)
 			}

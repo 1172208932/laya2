@@ -1,37 +1,36 @@
 import AlertDialog from "./AlertDialog";
 
 export default class SettingDialog extends Laya.Dialog {
-    onEnable() {
-        this.setUp()
-    }
-    setUp() {
-        if (localStorage.getItem("musicSwitchState") || localStorage.getItem("musicSwitchState") == 'true') {
-            Laya.SoundManager.musicMuted = true;
+    static setUp() {
+        if (localStorage.getItem("musicSwitchState") && localStorage.getItem("musicSwitchState") != 'false') {
+            Laya.SoundManager.musicVolume = 0;
         }
         else {
-            Laya.SoundManager.musicMuted = false;
+            Laya.SoundManager.musicVolume = 1;
         }
-        if (localStorage.getItem("effectSwitchState") || localStorage.getItem("effectSwitchState") == 'true') {
+        if (localStorage.getItem("effectSwitchState") && localStorage.getItem("effectSwitchState") != 'false') {
             Laya.SoundManager.soundMuted = true;
         }
         else {
             Laya.SoundManager.soundMuted = false;
         }
-        this.init()
     };
+    onEnable() {
+        this.init();
+    }
     init() {
         this.btnCopy.on(Laya.Event.CLICK, this, this.copy);
         this.musicSwitch.on(Laya.Event.CLICK, this, this.setMusicVolume);
         this.effectSwitch.on(Laya.Event.CLICK, this, this.setEffectVolume);
-        if (localStorage.getItem("musicSwitchState") || localStorage.getItem("musicSwitchState") == 'true') {
+        if (localStorage.getItem("musicSwitchState") && localStorage.getItem("musicSwitchState") != 'false') {
             this.musicSwitch.skin = "local/common/volumeBar0.png";
-            Laya.SoundManager.musicMuted = true;
+            Laya.SoundManager.musicVolume = 0;
         }
         else {
             this.musicSwitch.skin = "local/common/volumeBar1.png";
-            Laya.SoundManager.musicMuted = false;
+            Laya.SoundManager.musicVolume = 1;
         }
-        if (localStorage.getItem("effectSwitchState") || localStorage.getItem("effectSwitchState") == 'true') {
+        if (localStorage.getItem("effectSwitchState") && localStorage.getItem("effectSwitchState") != 'false') {
             this.effectSwitch.skin = "local/common/volumeBar0.png";
             Laya.SoundManager.soundMuted = true;
         }
@@ -48,13 +47,18 @@ export default class SettingDialog extends Laya.Dialog {
         });
     }
     setMusicVolume() {
-        Laya.SoundManager.musicMuted = !Laya.SoundManager.musicMuted;
-        localStorage.setItem("musicSwitchState", Laya.SoundManager.musicMuted);
-        this.musicSwitch.skin = Laya.SoundManager.musicMuted ? "local/common/volumeBar0.png" : "local/common/volumeBar1.png";
+        let musicVolume = Laya.SoundManager.musicVolume == 0 ? 1 : 0;
+        let musicMuted = musicVolume == 0 ? true : false;
+        Laya.SoundManager.setMusicVolume(musicVolume);
+        localStorage.setItem("musicSwitchState", musicMuted);
+        this.musicSwitch.skin = musicMuted ? "local/common/volumeBar0.png" : "local/common/volumeBar1.png";
     }
     setEffectVolume() {
         Laya.SoundManager.soundMuted = !Laya.SoundManager.soundMuted;
         localStorage.setItem("effectSwitchState", Laya.SoundManager.soundMuted);
         this.effectSwitch.skin = Laya.SoundManager.soundMuted ? "local/common/volumeBar0.png" : "local/common/volumeBar1.png";
+    }
+    onDisable() {
+        this.destroy();
     }
 }

@@ -1,4 +1,5 @@
 import Utils from "../utils/utils";
+import AlertDialog from "../dialog/AlertDialog";
 export default class BeanBox extends PaoYa.Component {
     /** @prop {name:boxType,tips:"1-豆子，2-积分（跳转商城），3-积分（展示），4-红包",type:Option,option:"1,2,3,4",default:1}*/
     onAwake() {
@@ -51,7 +52,16 @@ export default class BeanBox extends PaoYa.Component {
                 Utils.goToCharge()
                 break
             case '2':
-                this.navigator.push('IntegralMallView')
+                let alert = new AlertDialog({
+                    title: '兑换奖励',
+                    message: "关注“泡泡游戏”公众号，兑换积分奖励，还能抢先玩新游戏哦。",
+                    cancelText: `发送"1"关注`,
+                    confirmText: "跳过",
+                    cancelHandler: function () {
+                        Utils.openCustomer();
+                    }
+                })
+                alert.popup();
                 break
             case '4':
                 Utils.recordPoint('button002', 'click')

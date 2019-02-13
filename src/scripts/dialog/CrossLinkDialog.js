@@ -10,7 +10,7 @@ export default class CrossLinkDialog extends PaoYa.Dialog {
     onAwake() {
         /**弹窗关闭时自动销毁 */
         this.autoDestroyAtClosed = true
-        if (typeof (this.params) != 'string') {
+        if (typeof (this.params) != 'string' && this.params) {
             Laya.timer.once(2000, this, () => {
                 this.btnMatch.visible = true
             })
@@ -28,11 +28,10 @@ export default class CrossLinkDialog extends PaoYa.Dialog {
         this.addChild(btn)
     }
     setListView() {
-        let _this = this
         this.list.mouseHandler = new Laya.Handler(this, onSelect, [this.list]);
         function onSelect(list, e, index) {
             if (e.type == Laya.Event.CLICK) {
-                _this.control.gameClick(this.list.array[index], index)
+                this.control.gameClick(this.list.array[index], index)
             }
         }
     }

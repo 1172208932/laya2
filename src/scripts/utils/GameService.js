@@ -1,8 +1,10 @@
 import Service from '../../Service'
+import Utils from './utils';
 export default class GameService {
 
 }
 GameService.startGame = function (data) {
+    Utils.recordPoint('button020', 'click')
     Service.startGame(data)
 }
 GameService.stopGame = function (data) {

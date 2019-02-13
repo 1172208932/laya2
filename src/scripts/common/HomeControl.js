@@ -28,6 +28,8 @@ export default class HomeControl extends PaoYa.Component {
                 alert.popup();
                 break
             case 'matchBattle':
+                Utils.recordPoint('button006', 'click')
+                PaoYa.DataCenter.comeFrom = 'homeView'
                 this.navigator.push('MatchGradeView')
                 break
             case 'btnSet':

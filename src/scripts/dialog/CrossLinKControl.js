@@ -3,10 +3,10 @@ import MatchGradeService from "../common/MatchGradeService/MatchGradeService";
 
 export default class CrossLinkControl extends PaoYa.Component {
     onAwake() {
-        if (typeof (this.owner.params) != 'string') {
+        if (typeof (this.owner.params) != 'string' && this.owner.params) {
             this.gameType = this.owner.params.type;
             this.point = ''
-        } else {
+        } else if(this.owner.params) {
             this.point = this.owner.params
         }
         this.loadGameData((res) => {
@@ -14,7 +14,7 @@ export default class CrossLinkControl extends PaoYa.Component {
                 this.setData(list)
             })
         })
-        this.postPoint()
+        if (this.point) { this.postPoint() }
     }
     postPoint() {
         //统计曝光次数

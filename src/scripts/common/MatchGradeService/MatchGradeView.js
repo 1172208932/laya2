@@ -4,7 +4,6 @@ export default class MatchGradeView extends PaoYa.View {
     onAwake() {
         this.initData()
         if(PaoYa.DataCenter.loginData.is_review){
-            this.skipMall.visible=false;
             this.integral.visible=false;
         }
     }

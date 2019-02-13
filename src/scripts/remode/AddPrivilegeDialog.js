@@ -1,4 +1,5 @@
 import AlertDialog from "../dialog/AlertDialog";
+import Utils from "../utils/utils";
 
 export default class AddPrivilegeDialog extends PaoYa.Dialog {
     //开局特权弹框积分mode: 1或者豆子 mode: 0
@@ -106,31 +107,15 @@ export default class AddPrivilegeDialog extends PaoYa.Dialog {
         PaoYa.ShareManager.shareTitle(title, {}, () => {
             this.params.confirmHandler && this.params.confirmHandler()
             this.close()
+        }, () => {
+            PaoYa.Toast.show('分享到群才可以哦', 3000)
         })
     }
     videoMethod() {
         var _this = this
-        let params = {
-            onClose: function (res) {
-                if (res.isEnded) {
-                    _this.params.confirmHandler && _this.params.confirmHandler()
-                    _this.close()
-                } else {
-                    let errorDialog = new AlertDialog({
-                        title: "温馨提示",
-                        message: '看完广告才能获得开局特权哦！'
-                    })
-                    errorDialog.popup()
-                }
-            },
-            onError: function (res) {
-                let errorDialog = new AlertDialog({
-                    title: "温馨提示",
-                    message: res.errMsg
-                })
-                errorDialog.popup()
-            }
-        }
-        PaoYa.RewardedVideoAd.show(params)
+        Utils.forceReward(() => {
+            _this.params.confirmHandler && _this.params.confirmHandler()
+            _this.close()
+        })
     }
 }

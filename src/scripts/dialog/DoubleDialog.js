@@ -43,22 +43,14 @@ export default class DoubleDialog extends PaoYa.Dialog {
             PaoYa.ShareManager.shareTitle(content, {}, (res) => {
                 PaoYa.NotificationCenter.postNotification('double')
                 this.close()
+            }, () => {
+                PaoYa.Toast.show('分享到群才可以哦', 3000)
             })
         } else {
-            let params = {
-                onClose: function (res) {
-                    if (res.isEnded) {
-                        PaoYa.NotificationCenter.postNotification('double')
-                        _this.close()
-                    }
-                },
-                onError: function (res) {
-                    _this.imgIcon.skin = 'remote/share/fen_xiang.png'
-                    _this.imgIcon.pos(450, 633)
-                    _this.params.ratioType = 1
-                }
-            }
-            PaoYa.RewardedVideoAd.show(params);
+            Utils.forceReward(() => {
+                PaoYa.NotificationCenter.postNotification('double')
+                _this.close()
+            })
         }
     }
 }

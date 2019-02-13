@@ -1,6 +1,7 @@
 import GameService from "../../utils/GameService";
 import AlertDialog from '../../dialog/AlertDialog';
 import GameAgainControl from "../GameResult/GameAgainControl";
+import Utils from "../../utils/utils";
 export default class FBControl extends PaoYa.Component {
     /** @prop {name:btnInvite,tips:'',type:Node} */
     /** @prop {name:otherInfoView,tips:'',type:Node} */
@@ -15,7 +16,7 @@ export default class FBControl extends PaoYa.Component {
             this.createRoom()
         }
         this.setupData()
-        
+
         this.makeBreathingEffect(this.btnInvite)
         this.requestMessageList()
         //监听任务弹框点击邀请
@@ -29,7 +30,8 @@ export default class FBControl extends PaoYa.Component {
             } else {
                 this.createRoom()
             }
-        })
+        });
+        this.versionType = PaoYa.game.params.debug ? 'trial' : 'release';
     }
     onAppear() {
         this.timeLine && this.timeLine.resume()
@@ -73,7 +75,8 @@ export default class FBControl extends PaoYa.Component {
                     cancelText: '取消',
                     confirmText: '确定',
                     confirmHandler() {
-                        _this.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
+                        _this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+                        _this.updateShareMsg(1, '', _this.versionType);
                         _this.navigator.popToRootScene()
                         _this.navigator.push('MatchGradeView')
                     }
@@ -95,29 +98,81 @@ export default class FBControl extends PaoYa.Component {
         }
     }
     inviteFriend() {
-        let title = PaoYa.DataCenter.config.game.share_list.randomItem;
+        let title = PaoYa.DataCenter.config.game.share_content_friend_list.randomItem;
+        let img = PaoYa.DataCenter.CDNURL + PaoYa.DataCenter.config.game.share_img_friend_list.randomItem;
         let params = {
             rname: this.rname,
             type: PaoYa.ShareType.InviteFriend
         }
-        let _this = this
-        this.shareTitle(title, params, function () {
+        var _this = this         
+        this.share(title, img, params, function () {
             _this.owner.boxBefore.visible = true
             _this.startTimer()
         })
     }
+    updateShareMenu(fun) {
+        let _this = this;
+        if(!this.activityId) return;
+        console.log('更新shareMenu');
+        wx.updateShareMenu({
+            withShareTicket: true,
+            isUpdatableMessage: true,
+            activityId: this.activityId, // 活动 ID
+            templateInfo: {
+              parameterList: [{
+                name: 'member_count',
+                value: '1'
+              }, {
+                name: 'room_limit',
+                value: '2'
+              }]
+            },
+            complete: function(msg) {
+                console.log('更新成功：', msg);
+                _this.activityStatus = true;
+                fun && fun();
+            }
+          })
+    }
+    updateShareMsg(status, param1, param2) {
+        if(this.activityId && this.activityStatus) {
+            console.log('更新分享数据', status + ',' + param1 +',' + param2);
+            this.POST('update_wx_activity', {
+                activity_id: this.activityId,
+                status: status,
+                param1: param1,
+                param2: param2
+            }, function() {
+            });
+            if(status == 1) {
+                this.activityStatus = false;
+            }
+        }
+    }
     onReceiveMessage(cmd, res) {
+        let _this = this;
         switch (cmd) {
             case PaoYa.Client.SHARE_INVITE_FRIEND:
-                this.rname = res.room_name
-                this.inviteFriend()
+                this.rname = res.room_name;
+                this.activityId = res.activity_id;
+                if(this.activityId) {
+                    console.log('活动id：' + this.activityId);
+                    this.updateShareMenu(function() {
+                        this.inviteFriend()
+                    }.bind(_this));
+                }else {
+                    this.inviteFriend()
+                }
                 break
             case PaoYa.Client.DISCONNECT:
                 this.timeLine && this.timeLine.resume()
                 //判断是离开的是否是房主
-                if (res.owner_id == Number(this.rname.split("_")[1])) {
+                if (!_this.activityStatus || res.owner_id == Number(this.rname.split("_")[1])) {
                     this.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
-                    this.rname = ""
+                    this.rname = "";
+                    this.updateShareMsg(1, '', this.versionType);
+                }else {
+                    this.updateShareMsg(0, 1, 2);     
                 }
                 this.owner.getComponent(GameAgainControl).enabled = false;
                 this.stopTimer()
@@ -128,7 +183,8 @@ export default class FBControl extends PaoYa.Component {
                 Laya.Dialog.manager.closeAll()
                 this.stopTimer()
                 this.peopleJoinRoomData = res
-                this.handlePeopleJoinRoom(res)
+                this.handlePeopleJoinRoom(res);
+                this.updateShareMsg(0, 2, 2);
                 break
             case PaoYa.Client.GAME_START_GAME:
                 Laya.Dialog.manager.closeAll()
@@ -144,6 +200,8 @@ export default class FBControl extends PaoYa.Component {
                     matchData: value,
                     gameData: res
                 }
+                console.error('FBControl: GameService.startGame');
+                this.updateShareMsg(1, '', this.versionType);
                 GameService.startGame(data)
                 break
             case 'message':
@@ -154,7 +212,7 @@ export default class FBControl extends PaoYa.Component {
     handlePeopleJoinRoom(value) {
         if (value && value.status == 1 && value.invite_user) {
             let inviteUser = value.invite_user
-            let user = value.receive_user            
+            let user = value.receive_user
             if (inviteUser.user_id == PaoYa.DataCenter.user.id) {
                 this.otherUserId = value.receive_user.user_id
                 this.refreshUIWhenUserJoinRoom(user)
@@ -163,7 +221,7 @@ export default class FBControl extends PaoYa.Component {
                 this.otherUserId = value.invite_user.user_id
                 this.refreshUIWhenUserJoinRoom(inviteUser)
             }
-        } else {  
+        } else {
             PaoYa.Toast.showModal("提示", "好友房间已关闭，请重新创建房间", "知道了", () => {
                 this.owner.initView()
                 this.rname = ''
@@ -200,7 +258,7 @@ export default class FBControl extends PaoYa.Component {
         this.btnInvite.visible = false
         this.toggleEnable(true)
         this.owner.lblOtherName.text = PaoYa.Utils.formatName(other.user_name)
-        this.owner.imgOtherIcon.skin = PaoYa.Utils.makeIcon(other.user_icon)        
+        this.owner.imgOtherIcon.skin = PaoYa.Utils.makeIcon(other.user_icon)
         this.owner.lblOtherCity.text = other.location
     }
     startTimer() {
@@ -218,7 +276,9 @@ export default class FBControl extends PaoYa.Component {
                     cancelText: '取消',
                     confirmText: '随机匹配',
                     confirmHandler() {
-                        _this.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
+                        Utils.recordPoint('button019', 'click')
+                        _this.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+                        _this.updateShareMsg(1, '', this.versionType);
                         _this.navigator.popToRootScene()
                         _this.navigator.push('MatchGradeView', {}, null, Laya.Handler.create(this, (scene) => {
                             scene.beginMatch()
@@ -259,14 +319,16 @@ export default class FBControl extends PaoYa.Component {
             this.timeLine.pause()
         }
     }
-    onNetworkChange(){
-        this.socket.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
+    onNetworkChange() {
+        this.socket.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+        this.updateShareMsg(1, '', this.versionType);
         Laya.Dialog.manager.closeAll()
         this.navigator.popToRootScene()
     }
     onHide(res) {
         if (res && res.mode != undefined && res.targetAction != undefined && !(res.mode == "hide" && res.targetAction == 8)) {
-            this.socket.sendMessage(PaoYa.Client.LEAVE_ROOM, {})
+            this.socket.sendMessage(PaoYa.Client.LEAVE_ROOM, {});
+            this.updateShareMsg(1, '', this.versionType);
             Laya.Dialog.manager.closeAll()
             this.navigator.popToRootScene()
         }

@@ -18,7 +18,6 @@ import Back from "./scripts/prefab/Back"
 import IntegralMallControl from "./scripts/common/IntegralMallControl"
 import MatchGradeView from "./scripts/common/MatchGradeService/MatchGradeView"
 import BackUpDialogButton from "./scripts/prefab/BackUpDialogButton"
-import SkipMall from "./scripts/prefab/SkipMall"
 import FBButton from "./scripts/common/FriendBattle/FBButton"
 import Marquee from "./scripts/prefab/Marquee"
 import MatchGradeControl from "./scripts/common/MatchGradeService/MatchGradeControl"
@@ -55,6 +54,7 @@ import TaskReward from "./scripts/dialog/TaskReward"
 import MoreGameButton from "./scripts/prefab/MoreGameButton"
 import HomeControl from "./scripts/common/HomeControl"
 import RouletteView from "./scripts/common/View/RouletteView"
+import SkipMall from "./scripts/prefab/SkipMall"
 import WxIcon from "./scripts/prefab/WxIcon"
 
 export default class GameConfig {
@@ -80,7 +80,6 @@ export default class GameConfig {
 		reg("scripts/common/IntegralMallControl.js",IntegralMallControl);
 		reg("scripts/common/MatchGradeService/MatchGradeView.js",MatchGradeView);
 		reg("scripts/prefab/BackUpDialogButton.js",BackUpDialogButton);
-		reg("scripts/prefab/SkipMall.js",SkipMall);
 		reg("scripts/common/FriendBattle/FBButton.js",FBButton);
 		reg("scripts/prefab/Marquee.js",Marquee);
 		reg("scripts/common/MatchGradeService/MatchGradeControl.js",MatchGradeControl);
@@ -117,6 +116,7 @@ export default class GameConfig {
 		reg("scripts/prefab/MoreGameButton.js",MoreGameButton);
 		reg("scripts/common/HomeControl.js",HomeControl);
 		reg("scripts/common/View/RouletteView.js",RouletteView);
+		reg("scripts/prefab/SkipMall.js",SkipMall);
 		reg("scripts/prefab/WxIcon.js",WxIcon);
     }
 }
@@ -126,7 +126,7 @@ GameConfig.scaleMode ="fixedwidth";
 GameConfig.screenMode = "none";
 GameConfig.alignV = "top";
 GameConfig.alignH = "left";
-GameConfig.startScene = "scenes/common/Loading/LoadWaitingView.scene";
+GameConfig.startScene = "scenes/HomeView.scene";
 GameConfig.sceneRoot = "";
 GameConfig.debug = false;
 GameConfig.stat = false;

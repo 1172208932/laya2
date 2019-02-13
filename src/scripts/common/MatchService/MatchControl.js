@@ -115,6 +115,9 @@ export default class MatchControl extends PaoYa.Component {
     }
     /*1.匹配超时弹框 2.匹配失败弹框*/
     matchTimeout() {
+        if(PaoYa.navigator.visibleSceneIs('GameView')){
+            return;
+        }
         let _this = this;
         this.stopMatchTimeout();
         this.stopMatch(false);

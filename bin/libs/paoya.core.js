@@ -321,6 +321,11 @@ var Component = /** @class */ (function (_super) {
     /**有节制的点击，防止用户点击频率过快，默认间隔500ms */
     Component.prototype.onThrottleClick = function (e) {
     };
+    Component.prototype._onLoad = function () {
+        this.onLoad();
+    };
+    Component.prototype.onLoad = function () {
+    };
     Component.prototype._onAppear = function () {
         this.showAllBannerAd();
         this.onAppear();
@@ -439,10 +444,8 @@ var Component = /** @class */ (function (_super) {
         //1、支持动态参数
         //2、支持新版本回掉
         _wx_manager_ShareManager__WEBPACK_IMPORTED_MODULE_1__["default"].share(title, image, query, function (res) {
-            success && success.bind(_this, res);
-        }, function (res) {
-            fail && fail.bind(_this, res);
-        });
+            success && success.call(_this, res);
+        }, fail && fail.bind(this));
     };
     /**分享方法，可以不用传入图片，图片将从 ShareManager.imageURL 获取 */
     Component.prototype.shareTitle = function (title, query, success, fail) {
@@ -1037,11 +1040,20 @@ var ShareService = /** @class */ (function () {
         this.successHandler = null;
         this.failHandler = null;
         this.inShare = false;
+        this.shareTime = 0;
         _core_NotificationCenter__WEBPACK_IMPORTED_MODULE_0__["default"].on(_core_NotificationCenter__WEBPACK_IMPORTED_MODULE_0__["NotificationName"].ApplicationShow, this, this.onShow);
     }
     ShareService.prototype.onShow = function (res) {
         if (!this.successHandler)
             return;
+        if (Date.now() - this.shareTime < 3000) {
+            this.shareTime = 0;
+            if (this.failHandler) {
+                this.failHandler('分享到群才可以哦');
+                this.stopObserve();
+                return;
+            }
+        }
         var random = Math.floor(Math.random() * 3);
         random = 0;
         if (random == 0) {
@@ -1054,8 +1066,10 @@ var ShareService = /** @class */ (function () {
                 this.failHandler = null;
             }
         }
+        this.stopObserve();
     };
     ShareService.prototype.startObserve = function (suc, fail) {
+        this.shareTime = Date.now();
         this.successHandler = suc;
         this.failHandler = fail;
     };
@@ -1097,7 +1111,8 @@ var ShareManager = /** @class */ (function () {
             console.error("必须指定分享图片地址，建议使用ShareManager.imageURL全局设置统一分享图片");
             return;
         }
-        var shareService = this._shareService || new ShareService();
+        this._shareService || (this._shareService = new ShareService());
+        var shareService = this._shareService;
         if (window['wx']) { //只有在没有回调的平台中，才会去伪造分享成功返回
             shareService.startObserve(success, fail);
         }
@@ -2348,11 +2363,17 @@ var Dialog = /** @class */ (function (_super) {
     };
     Dialog.prototype._onAdded = function () {
         _super.prototype._onAdded.call(this);
+        this.onAdded();
         this._showBannerAd();
+    };
+    Dialog.prototype.onAdded = function () {
     };
     Dialog.prototype._onRemoved = function () {
         _super.prototype._onRemoved.call(this);
+        this.onRemoved();
         this._hideBannerAd();
+    };
+    Dialog.prototype.onRemoved = function () {
     };
     Dialog.prototype._showBannerAd = function () {
         if (this.showBannerAdWhenDialogPopup && _export__WEBPACK_IMPORTED_MODULE_0__["DataCenter"].showBannerAdWhenDialogPopup) {
@@ -2558,6 +2579,7 @@ var Navigator = /** @class */ (function (_super) {
             scene.sceneName = sceneName;
             this.visibleScene = scene;
             this.scenes.push(scene);
+            this._onLoad();
             this._onAppear();
             complete && complete.runWith(scene);
         }), progress);
@@ -2629,6 +2651,9 @@ var Navigator = /** @class */ (function (_super) {
     };
     Navigator.prototype._onHide = function (res) {
         this._dispatchEvent('_onHide', res);
+    };
+    Navigator.prototype._onLoad = function () {
+        this._dispatchEvent('_onLoad');
     };
     Navigator.prototype._onAppear = function () {
         this._dispatchEvent('_onAppear');
@@ -3907,15 +3932,15 @@ var LifeCircleMonitor = /** @class */ (function () {
                 _this.ignoreFirstTime = false;
                 return;
             }
-            console.log('SHOW :\n');
-            console.log(JSON.stringify(res));
+            console.warn('SHOW :\n');
+            console.warn(JSON.stringify(res));
             _this.inForeground = true;
             _core_NotificationCenter__WEBPACK_IMPORTED_MODULE_0__["default"].defaultCenter.event(_core_NotificationCenter__WEBPACK_IMPORTED_MODULE_0__["NotificationName"].ApplicationShow, res);
         });
         py.onHide(function (res) {
             //{mode:back}  {mode:close}
-            console.log("HIDE :\n");
-            console.log(JSON.stringify(res));
+            console.warn("HIDE :\n");
+            console.warn(JSON.stringify(res));
             _this.inForeground = false;
             _core_NotificationCenter__WEBPACK_IMPORTED_MODULE_0__["default"].defaultCenter.event(_core_NotificationCenter__WEBPACK_IMPORTED_MODULE_0__["NotificationName"].ApplicationHide, res);
         });

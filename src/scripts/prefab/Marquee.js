@@ -15,11 +15,11 @@ export default class Marquee extends PaoYa.Component {
         this._createHorn();
         this._createBg();
         this._createMarqueeView();
-        this._requestData(function (data) {
-            _this.info = _this.spellToHtml(data);
-            _this.addItem(1, _this.info[_this.index]);
-            _this.play();
-        })
+        PaoYa.NotificationCenter.addLoginNotification(this, () => {
+            this.info = PaoYa.DataCenter.config.game.strategy.split(';')
+            this.addItem(1, _this.info[_this.index]);
+            this.play();
+        })   
     }
     onAppear() {
         if (this.isFirst) {

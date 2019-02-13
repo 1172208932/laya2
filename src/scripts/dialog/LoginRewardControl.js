@@ -1,4 +1,5 @@
 import AlertDialog from "./AlertDialog";
+import Utils from "../utils/utils";
 
 export default class LoginRewardControl extends PaoYa.Component {
     onAwake() {
@@ -12,28 +13,16 @@ export default class LoginRewardControl extends PaoYa.Component {
     onClick(e) {
         var _this = this
         if (e.target.name == 'btnOK') {
-            let params = {
-                onClose: function (res) {
-                    if (res.isEnded) {
-                        _this.POST('qq_receive_reward', data => {
-                            PaoYa.DataCenter.refreshUserInfo()
-                            let type = data.pao_gold == 0 ? "积分" : "豆子"
-                            let num = data.pao_gold == 0 ? data.integral : data.pao_gold
-                            let dialog = new AlertDialog({ title: "温馨提示", message: `恭喜获得${num}${type}` })
-                            dialog.popup()
-                        })
-                        _this.owner.close()
-                    }
-                },
-                onError: function (res) {
-                    let errorDialog = new AlertDialog({
-                        title: "温馨提示",
-                        message: res.errMsg
-                    })
-                    errorDialog.popup()
-                }
-            }
-            this.showRewardedVideoAd(params);
+            Utils.forceReward(() => {
+                _this.POST('qq_receive_reward', data => {
+                    PaoYa.DataCenter.refreshUserInfo()
+                    let type = data.pao_gold == 0 ? "积分" : "豆子"
+                    let num = data.pao_gold == 0 ? data.integral : data.pao_gold
+                    let dialog = new AlertDialog({ title: "温馨提示", message: `恭喜获得${num}${type}` })
+                    dialog.popup()
+                })
+                _this.owner.close()
+            })
         }
     }
 }
